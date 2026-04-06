@@ -4,7 +4,7 @@
 
 **DialIn** is a cyberpunk-themed online color memory game where players memorize colors and recreate them using HSB sliders.
 
-🔗 **Live Demo:** Coming Soon
+🔗 **Live Demo:** [dialin.pages.dev](https://dialin.pages.dev) (deploy from GitHub)
 
 ## Features
 
