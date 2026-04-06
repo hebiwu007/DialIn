@@ -19,6 +19,8 @@
   <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body class="scanlines">
+  <!-- Language Toggle (fixed top-right) -->
+  <button class="lang-switch" id="lang-toggle" title="Switch Language">中文</button>
   <!-- Matrix Rain Background Canvas -->
   <canvas id="matrix-bg"></canvas>
 
@@ -33,6 +35,7 @@
       <div class="nav-stats" id="nav-stats">
         <span class="rank-badge" id="rank-badge">🥉 Bronze IV</span>
         <span class="rating-display" id="rating-display">0</span>
+        <button class="lang-switch nav-lang-switch" id="nav-lang-toggle" title="Switch Language">中文</button>
       </div>
     </nav>
 
@@ -70,18 +73,18 @@
 
         <div class="home-stats cyber-panel">
           <div class="stat-row">
-            <span class="stat-label">DIALRANK</span>
+            <span class="stat-label" data-i18n="labelRank">DIALRANK</span>
             <span class="stat-value" id="home-rank">🥉 Bronze IV</span>
           </div>
           <div class="stat-row">
-            <span class="stat-label">RATING</span>
+            <span class="stat-label" data-i18n="labelRating">RATING</span>
             <span class="stat-value mono" id="home-rating">0 / 400</span>
           </div>
           <div class="rating-bar">
             <div class="rating-bar-fill" id="home-rating-bar" style="width: 0%"></div>
           </div>
           <div class="stat-row">
-            <span class="stat-label">STREAK</span>
+            <span class="stat-label" data-i18n="labelStreak">STREAK</span>
             <span class="stat-value" id="home-streak">—</span>
           </div>
         </div>
@@ -151,13 +154,13 @@
             <!-- Results rendered here -->
           </div>
           <div class="results-actions">
-            <button class="neon-btn neon-btn-cyan" onclick="DialIn.shareResult()">
+            <button class="neon-btn neon-btn-cyan" data-i18n="btnShare" onclick="DialIn.shareResult()">
               📤 SHARE
             </button>
-            <button class="neon-btn neon-btn-purple" onclick="DialIn.playAgain()">
+            <button class="neon-btn neon-btn-purple" data-i18n="btnAgain" onclick="DialIn.playAgain()">
               🔄 AGAIN
             </button>
-            <button class="neon-btn" onclick="DialIn.navigate('/')">
+            <button class="neon-btn" data-i18n="btnHome" onclick="DialIn.navigate('/')">
               🏠 HOME
             </button>
           </div>
@@ -189,6 +192,7 @@
 
   <!-- Scripts -->
   <script src="js/scoring.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/colorPicker.js"></script>
   <script src="js/bias.js"></script>

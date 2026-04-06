@@ -7,21 +7,34 @@ const DialIn = {
   lastDifficulty: 'medium',
 
   init() {
+    // Initialize i18n
+    i18n.init();
+
     // Matrix rain background
     this._initMatrixRain();
-    
+
     // Update stats
     updateNavStats();
-    
+
     // Bind dial-in button
     document.getElementById('btn-dial-in').addEventListener('click', () => {
       audio.init();
       game.submitGuess();
     });
-    
+
+    // Bind all language toggle buttons
+    document.querySelectorAll('.lang-switch').forEach(btn => {
+      btn.addEventListener('click', () => {
+        audio.init();
+        i18n.toggle();
+        updateNavStats();
+        this._updateGameLabels();
+      });
+    });
+
     // Handle hash routing
     window.addEventListener('hashchange', () => this._route());
-    
+
     // Initial route
     this._route();
   },
@@ -34,7 +47,7 @@ const DialIn = {
   _route() {
     const hash = window.location.hash || '#/';
     const path = hash.replace('#', '');
-    
+
     if (path === '/' || path === '') {
       this._showPage('home');
     } else if (path === '/free') {
@@ -47,34 +60,53 @@ const DialIn = {
       } else {
         this._showPage('game');
         game.start('daily', 'medium');
+        this._updateGameLabels();
       }
     } else if (path === '/duel') {
-      // TODO: Duel mode
       this._showPage('home');
-      this.showToast('⚔ Duel mode coming soon!');
+      this.showToast(i18n.t('toastDuelSoon'));
     } else {
       this._showPage('home');
     }
   },
 
   _showPage(page) {
-    // Glitch transition
     const container = document.getElementById('page-container');
     container.classList.add('page-transition');
     setTimeout(() => container.classList.remove('page-transition'), 300);
-    
+
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(`page-${page}`).classList.add('active');
     this.currentPage = page;
   },
 
   _startFreeDial() {
-    // Recommend difficulty
     const data = loadPlayerData();
     const history = data.gameHistory || [];
     const difficulty = recommendDifficulty(history);
     this.lastDifficulty = difficulty;
     game.start('free', difficulty);
+    this._updateGameLabels();
+  },
+
+  _updateGameLabels() {
+    // Update game mode label
+    const modeLabel = document.getElementById('game-mode-label');
+    if (modeLabel) {
+      const modeMap = { free: 'gameFree', daily: 'gameDaily', duel: 'gameDuel' };
+      modeLabel.textContent = i18n.t(modeMap[game.mode] || 'gameFree');
+    }
+    // Update Dial In button
+    const dialBtn = document.getElementById('btn-dial-in');
+    if (dialBtn) dialBtn.textContent = i18n.t('btnDialIn');
+    // Update preview label
+    const previewLabel = document.querySelector('.preview-label');
+    if (previewLabel) previewLabel.textContent = i18n.t('labelYourSelection');
+    // Update round label
+    const roundLabel = document.getElementById('game-round');
+    if (roundLabel && game.colors.length > 0) {
+      roundLabel.textContent = i18n.t('gameRound', { current: game.currentRound + 1, total: game.colors.length });
+    }
   },
 
   _renderDailyPage() {
@@ -82,21 +114,27 @@ const DialIn = {
     const theme = getDailyTheme();
     document.getElementById('daily-date').textContent = dateStr;
     document.getElementById('daily-theme').textContent = theme.name;
-    
-    // Show played state
+
     const data = loadPlayerData();
     const btn = document.getElementById('btn-daily-play');
-    btn.textContent = `✓ PLAYED — ${data.lastDailyScore?.toFixed(1) || '0'}/50`;
-    btn.disabled = true;
-    btn.style.opacity = '0.5';
+    if (hasPlayedDaily()) {
+      btn.textContent = i18n.t('dailyPlayed', { score: (data.lastDailyScore || 0).toFixed(1) });
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+    } else {
+      btn.textContent = i18n.t('dailyPlay');
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    }
   },
 
   playAgain() {
     if (game.mode === 'daily') {
-      this.showToast('✓ Already played today!');
+      this.showToast(i18n.t('toastAlreadyPlayed'));
       return;
     }
     game.start('free', this.lastDifficulty);
+    this._updateGameLabels();
   },
 
   shareResult() {
@@ -139,32 +177,23 @@ const DialIn = {
     const fontSize = 14;
     let columns = Math.floor(canvas.width / fontSize);
     let drops = Array(columns).fill(1);
-
     const colors = ['#00F0FF', '#A855F7', '#FF0066', '#00FF88', '#FFE500'];
 
     function draw() {
       ctx.fillStyle = 'rgba(10, 10, 15, 0.08)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
       ctx.font = fontSize + 'px monospace';
-
       for (let i = 0; i < drops.length; i++) {
         const char = chars[Math.floor(Math.random() * chars.length)];
         ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
         ctx.globalAlpha = 0.4 + Math.random() * 0.6;
         ctx.fillText(char, i * fontSize, drops[i] * fontSize);
         ctx.globalAlpha = 1;
-
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
         drops[i]++;
       }
     }
-
     setInterval(draw, 50);
-
-    // Re-init on resize
     window.addEventListener('resize', () => {
       columns = Math.floor(canvas.width / fontSize);
       drops = Array(columns).fill(1);
@@ -181,7 +210,7 @@ function updateNavStats() {
 
   document.getElementById('rank-badge').textContent = `${rank.icon} ${rank.tier} ${rank.division}`;
   document.getElementById('rating-display').textContent = rating;
-  
+
   const homeRank = document.getElementById('home-rank');
   const homeRating = document.getElementById('home-rating');
   const homeBar = document.getElementById('home-rating-bar');
@@ -190,7 +219,11 @@ function updateNavStats() {
   if (homeRank) homeRank.textContent = `${rank.icon} ${rank.tier} ${rank.division}`;
   if (homeRating) homeRating.textContent = `${rating} / ${rank.nextRating}`;
   if (homeBar) homeBar.style.width = (rank.progress * 100) + '%';
-  if (homeStreak) homeStreak.textContent = streak > 0 ? `Day ${streak} 🔥` : '—';
+  if (homeStreak) {
+    homeStreak.textContent = streak > 0
+      ? i18n.t('streakDay', { n: streak })
+      : i18n.t('streakNone');
+  }
 }
 
 function recommendDifficulty(history) {
