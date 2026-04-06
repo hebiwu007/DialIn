@@ -364,7 +364,7 @@ class GameEngine {
       <div class="level-overlay-title" style="color:${color}">${title}</div>
       <div class="level-overlay-detail">${oldDesc} → ${newDesc}</div>
       <div class="level-overlay-sub">${isUp ? i18n.t('levelUpMsg') : i18n.t('levelDownMsg')}</div>
-      <button class="neon-btn neon-btn-cyan" style="width:100%" onclick="this.closest('.level-overlay').remove()">${isUp ? i18n.t('levelUpBtn') : i18n.t('levelDownBtn')}</button>
+      <button class="neon-btn neon-btn-cyan" style="width:100%" onclick="this.closest('.level-overlay').remove()">${i18n.t('btnConfirm')}</button>
     </div>`;
     document.body.appendChild(overlay);
     if (isUp) audio.play('levelUp');
