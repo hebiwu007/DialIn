@@ -9,23 +9,25 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-const INIT_SQL = `
-CREATE TABLE IF NOT EXISTS daily_scores (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  date TEXT NOT NULL,
-  nickname TEXT NOT NULL,
-  score REAL NOT NULL,
-  max_score REAL NOT NULL DEFAULT 50,
-  rounds_json TEXT,
-  personality TEXT,
-  created_at INTEGER NOT NULL DEFAULT (unixepoch())
-);
-CREATE INDEX IF NOT EXISTS idx_daily_date ON daily_scores(date);
-CREATE INDEX IF NOT EXISTS idx_daily_score ON daily_scores(date, score DESC);
-`;
+const INIT_SQLS = [
+  `CREATE TABLE IF NOT EXISTS daily_scores (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    date TEXT NOT NULL,
+    nickname TEXT NOT NULL,
+    score REAL NOT NULL,
+    max_score REAL NOT NULL DEFAULT 50,
+    rounds_json TEXT,
+    personality TEXT,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch())
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_daily_date ON daily_scores(date)`,
+  `CREATE INDEX IF NOT EXISTS idx_daily_score ON daily_scores(date, score DESC)`,
+];
 
 async function ensureSchema(db) {
-  await db.exec(INIT_SQL);
+  for (const sql of INIT_SQLS) {
+    await db.exec(sql);
+  }
 }
 
 export async function onRequestOptions() {
