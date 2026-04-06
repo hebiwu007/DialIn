@@ -1,0 +1,17 @@
+{
+  "name": "dialin",
+  "version": "1.0.0",
+  "description": "DialIn — A Cyberpunk Color Memory Game",
+  "scripts": {
+    "dev": "npx wrangler dev",
+    "deploy": "npx wrangler deploy",
+    "build": "echo 'Static site, no build needed'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hebiwu007/DialIn.git"
+  },
+  "keywords": ["color", "memory", "game", "cyberpunk", "ciede2000"],
+  "author": "DialIn Team",
+  "license": "MIT"
+}
