@@ -210,8 +210,11 @@ class GameEngine {
   }
 
   _showPhase(id) {
-    document.querySelectorAll('.game-phase').forEach(p => p.classList.remove('active-phase'));
-    document.getElementById(id)?.classList.add('active-phase');
+    document.querySelectorAll('.game-phase').forEach(p => {
+      p.classList.remove('active-phase');
+    });
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active-phase');
   }
 
   getResults() { return this.results; }
