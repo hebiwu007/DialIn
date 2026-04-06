@@ -188,7 +188,98 @@ class GameEngine {
     // Save for sharing
     this.results = { mode:this.mode, level:this.level, rounds:this.guesses, totalScore:Math.round(total*10)/10, maxScore:max, personality:bias.personality, streak, levelChange };
 
+    // Daily mode: mark played & show nickname submit
+    if (this.mode === 'daily') {
+      markDailyPlayed(Math.round(total*10)/10);
+      this._showDailySubmit(total, max, bias.personality);
+    }
+
     updateNavStats();
+  }
+
+  async _showDailySubmit(totalScore, maxScore, personality) {
+    const savedNick = getDailyNickname();
+    if (savedNick) {
+      // Auto-submit with saved nickname
+      const data = await submitDailyScore(
+        savedNick, Math.round(totalScore*10)/10, maxScore,
+        this.guesses.map(g => ({ s: g.score.toFixed(1) })),
+        personality.name
+      );
+      this._renderDailyLeaderboard(data);
+    } else {
+      // Show nickname input in summary
+      const wrap = document.getElementById('summary-wrap');
+      const submitDiv = document.createElement('div');
+      submitDiv.className = 'daily-nick-submit cyber-panel fade-in';
+      submitDiv.style.cssText = 'width:100%;max-width:350px;margin-top:12px;text-align:center;';
+      submitDiv.innerHTML = `
+        <div style="font-family:var(--font-display);font-size:13px;color:var(--neon-purple);letter-spacing:2px;margin-bottom:8px;">${i18n.t('dailyEnterNick')}</div>
+        <input type="text" id="daily-nick-input" maxlength="20" placeholder="${i18n.t('dailyNickPlaceholder')}" 
+          style="background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-primary);
+          padding:10px 14px;font-size:14px;width:100%;border-radius:4px;text-align:center;font-family:var(--font-body);">
+        <button class="neon-btn neon-btn-purple" style="width:100%;margin-top:8px" id="daily-nick-btn">${i18n.t('dailySubmitScore')}</button>
+      `;
+      wrap.appendChild(submitDiv);
+      document.getElementById('daily-nick-btn').addEventListener('click', async () => {
+        const nick = document.getElementById('daily-nick-input').value.trim();
+        if (!nick) return;
+        setDailyNickname(nick);
+        const data = await submitDailyScore(
+          nick, Math.round(totalScore*10)/10, maxScore,
+          game.guesses.map(g => ({ s: g.score.toFixed(1) })),
+          personality.name
+        );
+        submitDiv.remove();
+        game._renderDailyLeaderboard(data);
+      });
+    }
+  }
+
+  _renderDailyLeaderboard(data) {
+    if (!data || !data.leaderboard) return;
+    const wrap = document.getElementById('summary-wrap');
+    const lbDiv = document.createElement('div');
+    lbDiv.className = 'daily-lb cyber-panel fade-in';
+    lbDiv.style.cssText = 'width:100%;max-width:380px;margin-top:12px;';
+
+    let html = `<div style="font-family:var(--font-display);font-size:13px;color:var(--neon-purple);letter-spacing:2px;text-align:center;margin-bottom:10px;">
+      ${i18n.t('dailyLeaderboard')} · ${data.totalPlayers} ${i18n.t('dailyPlayers')}</div>`;
+    html += '<div style="display:flex;flex-direction:column;gap:4px;">';
+
+    const nick = getDailyNickname();
+    const top20 = data.leaderboard.slice(0, 20);
+    top20.forEach(entry => {
+      const isMe = entry.nickname === nick;
+      const medal = entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : `${entry.rank}.`;
+      const bg = isMe ? 'background:rgba(0,240,255,0.08);border:1px solid var(--neon-cyan);' : '';
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:4px;font-size:13px;${bg}">
+        <span><span style="margin-right:6px;">${medal}</span><span style="color:${isMe?'var(--neon-cyan)':'var(--text-primary)'}">${entry.nickname}</span></span>
+        <span style="font-family:var(--font-mono);color:var(--neon-yellow)">${entry.score.toFixed(1)}</span>
+      </div>`;
+    });
+
+    // Show "you" if not in top 20
+    const myEntry = data.leaderboard.find(e => e.nickname === nick);
+    if (myEntry && myEntry.rank > 20) {
+      html += `<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:4px;">...</div>`;
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:4px;font-size:13px;background:rgba(0,240,255,0.08);border:1px solid var(--neon-cyan);">
+        <span><span style="margin-right:6px;">${myEntry.rank}.</span><span style="color:var(--neon-cyan)">${myEntry.nickname}</span></span>
+        <span style="font-family:var(--font-mono);color:var(--neon-yellow)">${myEntry.score.toFixed(1)}</span>
+      </div>`;
+    }
+
+    html += '</div>';
+
+    // Percentile
+    if (myEntry) {
+      const pct = Math.round((1 - myEntry.rank / data.totalPlayers) * 100);
+      html += `<div style="text-align:center;margin-top:10px;font-size:13px;color:var(--neon-green);">
+        ${i18n.t('dailyBeatPercent', { pct })}</div>`;
+    }
+
+    lbDiv.innerHTML = html;
+    wrap.appendChild(lbDiv);
   }
 
   _showLevelOverlay(change) {

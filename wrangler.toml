@@ -5,4 +5,4 @@ pages_build_output_dir = "./public"
 [[d1_databases]]
 binding = "DB"
 database_name = "dialin-db"
-database_id = "placeholder"
+database_id = "9cc4eae6-be85-4a87-a8f5-e9712bad10f2"

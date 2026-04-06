@@ -40,17 +40,39 @@ const DialIn = {
     game.start('daily', 3);
   },
 
-  _renderDaily() {
-    document.getElementById('daily-date').textContent = getDailyDate();
-    document.getElementById('daily-theme').textContent = getDailyTheme().name;
+  async _renderDaily() {
+    const date = getDailyDate();
+    const theme = getDailyTheme();
+    const lang = i18n.getLang();
+    document.getElementById('daily-date').textContent = date;
+    document.getElementById('daily-theme').textContent = lang === 'zh' ? theme.name : theme.nameEn;
+
     const btn = document.getElementById('btn-daily-play');
     const resultDiv = document.getElementById('daily-result');
+    const lbDiv = document.getElementById('daily-leaderboard');
+
+    // Fetch leaderboard
+    const data = await fetchDailyLeaderboard(date);
+    if (data && data.leaderboard && data.leaderboard.length > 0) {
+      let html = `<div style="font-family:var(--font-display);font-size:12px;color:var(--neon-purple);letter-spacing:2px;text-align:center;margin-bottom:8px;">
+        ${i18n.t('dailyLeaderboard')} · ${data.totalPlayers} ${i18n.t('dailyPlayers')}</div>`;
+      data.leaderboard.slice(0, 10).forEach(e => {
+        const medal = e.rank===1?'🥇':e.rank===2?'🥈':e.rank===3?'🥉':`${e.rank}.`;
+        html += `<div style="display:flex;justify-content:space-between;padding:4px 8px;font-size:12px;">
+          <span>${medal} ${e.nickname}</span><span class="mono" style="color:var(--neon-yellow)">${e.score.toFixed(1)}</span></div>`;
+      });
+      lbDiv.innerHTML = html;
+    } else {
+      lbDiv.innerHTML = `<div style="text-align:center;font-size:12px;color:var(--text-muted);padding:8px;">${i18n.t('dailyNoPlayers')}</div>`;
+    }
+
     if (hasPlayedDaily()) {
-      const data = loadPlayerData();
-      btn.textContent = i18n.t('dailyPlayed', { score: (data.lastDailyScore||0).toFixed(1) });
+      const pd = loadPlayerData();
+      btn.textContent = i18n.t('dailyPlayed', { score: (pd.lastDailyScore||0).toFixed(1) });
       btn.disabled = true; btn.style.opacity = '0.4';
       resultDiv.classList.remove('hidden');
-      resultDiv.innerHTML = `<div style="text-align:center;padding:8px;color:var(--neon-cyan)">${i18n.t('dailyScore')}: ${data.lastDailyScore?.toFixed(1) || '0'} / 50</div>`;
+      resultDiv.innerHTML = `<div style="text-align:center;padding:8px;color:var(--neon-cyan)">
+        ${i18n.t('dailyScore')}: ${pd.lastDailyScore?.toFixed(1) || '0'} / 50</div>`;
     } else {
       btn.textContent = i18n.t('dailyPlay');
       btn.disabled = false; btn.style.opacity = '1';
