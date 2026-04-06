@@ -2,6 +2,9 @@
  * DialIn — App Controller v3
  */
 const DialIn = {
+  currentDuelId: null,
+  duelColors: null,
+
   init() {
     i18n.init();
     this._initMatrixRain();
@@ -18,11 +21,18 @@ const DialIn = {
   navigate(path) { audio.init(); window.location.hash = path; },
 
   _route() {
-    const path = (window.location.hash || '#/').replace('#','');
-    if (path === '/' || path === '') this._showPage('home');
-    else if (path === '/free') { this._showPage('game'); game.start('free', getPlayerLevel()); }
-    else if (path === '/daily') { this._showPage('daily'); this._renderDaily(); }
-    else if (path === '/duel') this._showPage('duel');
+    const hash = (window.location.hash || '#/').replace('#', '');
+    const parts = hash.split('/').filter(Boolean);
+
+    if (hash === '/' || hash === '') this._showPage('home');
+    else if (hash === '/free') { this._showPage('game'); game.start('free', getPlayerLevel()); }
+    else if (hash === '/daily') { this._showPage('daily'); this._renderDaily(); }
+    else if (hash === '/duel' || hash === '/duel/') { this._showPage('duel'); this._showDuelHome(); }
+    else if (parts[0] === 'duel' && parts[1]) {
+      this._showPage('duel');
+      this.currentDuelId = parts[1];
+      this._showDuelAccept(parts[1]);
+    }
     else this._showPage('home');
   },
 
@@ -34,6 +44,13 @@ const DialIn = {
     document.getElementById(`page-${page}`)?.classList.add('active');
   },
 
+  // ===== FREE =====
+  playAgain() {
+    if (game.mode === 'daily') { this.showToast(i18n.t('alreadyPlayed')); return; }
+    game.start('free', getPlayerLevel());
+  },
+
+  // ===== DAILY =====
   startDaily() {
     if (hasPlayedDaily()) { this.showToast(i18n.t('alreadyPlayed')); return; }
     this._showPage('game');
@@ -51,7 +68,6 @@ const DialIn = {
     const resultDiv = document.getElementById('daily-result');
     const lbDiv = document.getElementById('daily-leaderboard');
 
-    // Fetch leaderboard
     const data = await fetchDailyLeaderboard(date);
     if (data && data.leaderboard && data.leaderboard.length > 0) {
       let html = `<div style="font-family:var(--font-display);font-size:12px;color:var(--neon-purple);letter-spacing:2px;text-align:center;margin-bottom:8px;">
@@ -80,12 +96,139 @@ const DialIn = {
     }
   },
 
-  playAgain() {
-    if (game.mode === 'daily') { this.showToast(i18n.t('alreadyPlayed')); return; }
-    game.start('free', getPlayerLevel());
+  // ===== DUEL =====
+  _showDuelHome() {
+    document.querySelectorAll('.duel-section').forEach(s => s.classList.add('hidden'));
+    document.getElementById('duel-home').classList.remove('hidden');
   },
 
-  shareResult() { const r = game.getResults(); if (r) shareResult(r); },
+  duelCreate() {
+    audio.init();
+    this.duelColors = generateDuelColors();
+    this.currentDuelId = null;
+    // Start game in duel mode
+    this._showPage('game');
+    game._startDuel(this.duelColors);
+  },
+
+  async duelCreateFinish(results) {
+    const nick = getDailyNickname() || 'Player';
+    const data = await createDuel(
+      nick,
+      this.duelColors || game.colors,
+      results.totalScore,
+      results.rounds.map(r => ({ s: r.score.toFixed(1) })),
+      results.personality.name
+    );
+    if (data && data.id) {
+      this.currentDuelId = data.id;
+      this._showPage('duel');
+      document.querySelectorAll('.duel-section').forEach(s => s.classList.add('hidden'));
+      document.getElementById('duel-created').classList.remove('hidden');
+      document.getElementById('duel-created-score').innerHTML =
+        `<div style="font-size:24px;color:var(--neon-cyan);font-family:var(--font-display);">${results.totalScore} / ${results.maxScore}</div>`;
+      document.getElementById('duel-link-url').textContent = data.url;
+    }
+  },
+
+  duelCopyLink() {
+    const url = document.getElementById('duel-link-url').textContent;
+    copyToClipboard(url);
+    this.showToast(i18n.t('duelCopied'));
+  },
+
+  async duelJoin() {
+    const code = document.getElementById('duel-join-code').value.trim().toUpperCase();
+    if (!code || code.length < 4) { this.showToast(i18n.t('duelInvalidCode')); return; }
+    this.currentDuelId = code;
+    this.navigate(`/duel/${code}`);
+  },
+
+  async _showDuelAccept(duelId) {
+    const data = await fetchDuel(duelId);
+    if (!data || data.error) {
+      this.showToast(data?.error || 'Duel not found');
+      this.navigate('/duel');
+      return;
+    }
+    document.querySelectorAll('.duel-section').forEach(s => s.classList.add('hidden'));
+    document.getElementById('duel-accept').classList.remove('hidden');
+    document.getElementById('duel-accept-creator').textContent = data.leaderboard?.[0]?.nickname || 'Someone';
+
+    // Show current leaderboard
+    const lbDiv = document.getElementById('duel-accept-lb');
+    if (data.leaderboard && data.leaderboard.length > 0) {
+      let html = '<div style="font-size:12px;text-align:center;margin-bottom:6px;color:var(--text-secondary);">' +
+        `${data.totalPlayers} ${i18n.t('dailyPlayers')} · ${i18n.t('duelTopScore')}: ${data.leaderboard[0].score.toFixed(1)}</div>`;
+      data.leaderboard.slice(0, 5).forEach(e => {
+        const medal = e.rank===1?'🥇':e.rank===2?'🥈':e.rank===3?'🥉':`${e.rank}.`;
+        html += `<div style="display:flex;justify-content:space-between;padding:3px 8px;font-size:12px;">
+          <span>${medal} ${e.nickname}</span><span class="mono" style="color:var(--neon-yellow)">${e.score.toFixed(1)}</span></div>`;
+      });
+      lbDiv.innerHTML = html;
+    } else {
+      lbDiv.innerHTML = '';
+    }
+
+    // Store colors for game
+    this.duelColors = data.colors;
+  },
+
+  async duelAccept() {
+    const nick = document.getElementById('duel-accept-nick').value.trim();
+    if (!nick) return;
+    setDailyNickname(nick);
+    this._showPage('game');
+    game._startDuel(this.duelColors);
+  },
+
+  async duelJoinFinish(results) {
+    const nick = getDailyNickname() || 'Player';
+    const data = await joinDuel(
+      this.currentDuelId,
+      nick,
+      results.totalScore,
+      results.rounds.map(r => ({ s: r.score.toFixed(1) })),
+      results.personality.name
+    );
+    if (data && data.leaderboard) {
+      this._showPage('duel');
+      document.querySelectorAll('.duel-section').forEach(s => s.classList.add('hidden'));
+      document.getElementById('duel-result').classList.remove('hidden');
+      this._renderDuelLeaderboard('duel-result-lb', data, nick);
+    }
+  },
+
+  _renderDuelLeaderboard(containerId, data, myNick) {
+    const container = document.getElementById(containerId);
+    let html = `<div style="font-family:var(--font-display);font-size:13px;color:var(--neon-pink);letter-spacing:2px;text-align:center;margin-bottom:10px;">
+      ⚔ ${i18n.t('duelLeaderboard')}</div>`;
+    html += '<div style="display:flex;flex-direction:column;gap:4px;">';
+    data.leaderboard.forEach(e => {
+      const isMe = e.nickname === myNick;
+      const medal = e.rank===1?'🥇':e.rank===2?'🥈':e.rank===3?'🥉':`${e.rank}.`;
+      const bg = isMe ? 'background:rgba(255,0,102,0.08);border:1px solid var(--neon-pink);' : '';
+      html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:4px;font-size:13px;${bg}">
+        <span><span style="margin-right:6px;">${medal}</span><span style="color:${isMe?'var(--neon-pink)':'var(--text-primary)'}">${e.nickname}${e.isCreator?' 👑':''}</span></span>
+        <span style="font-family:var(--font-mono);color:var(--neon-yellow)">${e.score.toFixed(1)}</span>
+      </div>`;
+    });
+    html += '</div>';
+    // Winner announcement
+    if (data.leaderboard.length >= 2) {
+      const winner = data.leaderboard[0];
+      html += `<div style="text-align:center;margin-top:12px;font-family:var(--font-display);font-size:14px;color:var(--neon-green);">
+        🏆 ${winner.nickname} ${i18n.t('duelWins')}!</div>`;
+    }
+    container.innerHTML = html;
+  },
+
+  // ===== SHARE =====
+  shareResult() {
+    const r = game.getResults();
+    if (!r) return;
+    shareResult(r);
+  },
 
   showToast(msg) {
     const t = document.createElement('div');
@@ -122,7 +265,6 @@ const DialIn = {
 
 function updateNavStats() {
   const level = getPlayerLevel();
-  const cfg = getLevelConfig(level);
   const progress = getLevelProgress();
   const streak = getPlayerStreak();
   document.getElementById('nav-level').textContent = `Level ${level}`;

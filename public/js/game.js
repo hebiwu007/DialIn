@@ -33,6 +33,18 @@ class GameEngine {
     this._showColor(cfg.showTime);
   }
 
+  _startDuel(colors) {
+    this.mode = 'duel'; this.level = 3;
+    this.colors = colors;
+    this.currentRound = 0; this.guesses = []; this.biasHistory = [];
+    this.phase = 'show';
+    const data = loadPlayerData();
+    this.biasHistory = data.biasHistory || [];
+    this._renderProgress();
+    this._showPhase('phase-show');
+    this._showColor(5); // 5 seconds like daily
+  }
+
   _renderProgress() {
     const container = document.getElementById('progress-dots');
     container.innerHTML = '';
@@ -133,7 +145,7 @@ class GameEngine {
       this.phase = 'show';
       this._updateProgress();
       this._showPhase('phase-show');
-      const cfg = this.mode === 'daily' ? { showTime: 5 } : getLevelConfig(this.level);
+      const cfg = this.mode === 'daily' || this.mode === 'duel' ? { showTime: 5 } : getLevelConfig(this.level);
       this._showColor(cfg.showTime);
     }
   }
@@ -192,6 +204,18 @@ class GameEngine {
     if (this.mode === 'daily') {
       markDailyPlayed(Math.round(total*10)/10);
       this._showDailySubmit(total, max, bias.personality);
+    }
+
+    // Duel mode: create or join
+    if (this.mode === 'duel') {
+      updateStreak();
+      if (!DialIn.currentDuelId) {
+        // Creator: show create flow
+        DialIn.duelCreateFinish(this.results);
+      } else {
+        // Challenger: submit score
+        DialIn.duelJoinFinish(this.results);
+      }
     }
 
     updateNavStats();

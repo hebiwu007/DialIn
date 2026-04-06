@@ -129,10 +129,65 @@
 
     <!-- DUEL -->
     <section id="page-duel" class="page">
-      <div class="duel-placeholder">
-        <h2>⚔ DUEL</h2>
-        <p data-i18n="duelComing">Coming Soon</p>
-        <button class="neon-btn" onclick="DialIn.navigate('/')" data-i18n="btnHome">🏠 HOME</button>
+      <div class="duel-container" id="duel-container">
+        <!-- Duel home -->
+        <div id="duel-home" class="duel-section">
+          <h2 style="font-size:28px;letter-spacing:4px;color:var(--neon-pink);margin-bottom:20px;">⚔ DUEL</h2>
+          <div class="duel-options">
+            <button class="neon-btn neon-btn-pink" style="width:100%;max-width:300px;margin-bottom:12px;" onclick="DialIn.duelCreate()">
+              <span class="btn-icon">⚔</span>
+              <span class="btn-text" data-i18n="duelCreate">CREATE CHALLENGE</span>
+              <span class="btn-sub" data-i18n="duelCreateSub">Play & share link</span>
+            </button>
+            <div style="display:flex;gap:8px;width:100%;max-width:300px;">
+              <input type="text" id="duel-join-code" placeholder="CODE" maxlength="6"
+                style="flex:1;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-primary);
+                padding:12px;font-size:16px;font-family:var(--font-mono);letter-spacing:4px;text-align:center;border-radius:4px;text-transform:uppercase;">
+              <button class="neon-btn neon-btn-cyan" style="flex:1;" onclick="DialIn.duelJoin()">
+                <span class="btn-text" data-i18n="duelJoin">JOIN</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Duel game (reuses game engine with mode=duel) -->
+
+        <!-- Duel result: creator -->
+        <div id="duel-created" class="duel-section hidden">
+          <h2 style="font-size:22px;letter-spacing:3px;color:var(--neon-green);margin-bottom:16px;" data-i18n="duelCreatedTitle">⚔ CHALLENGE CREATED!</h2>
+          <div class="duel-score-display" id="duel-created-score"></div>
+          <div class="duel-link-box cyber-panel" style="width:100%;max-width:350px;margin:12px auto;text-align:center;">
+            <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;" data-i18n="duelShareLink">Share this link:</div>
+            <div class="mono" style="font-size:11px;color:var(--neon-cyan);word-break:break-all;padding:8px;background:var(--bg-secondary);border-radius:4px;" id="duel-link-url"></div>
+            <button class="neon-btn neon-btn-cyan" style="width:100%;margin-top:8px;" id="btn-copy-link" onclick="DialIn.duelCopyLink()">
+              <span class="btn-text" data-i18n="duelCopyLink">📋 COPY LINK</span>
+            </button>
+          </div>
+          <div id="duel-created-lb" style="width:100%;max-width:380px;margin-top:12px;"></div>
+        </div>
+
+        <!-- Duel accept -->
+        <div id="duel-accept" class="duel-section hidden">
+          <h2 style="font-size:20px;letter-spacing:3px;color:var(--neon-pink);margin-bottom:12px;">⚔ <span id="duel-accept-creator"></span></h2>
+          <div style="font-size:14px;color:var(--text-secondary);margin-bottom:6px;" data-i18n="duelInvitesYou">invites you to a color challenge!</div>
+          <div id="duel-accept-lb" style="width:100%;max-width:350px;margin:12px auto;"></div>
+          <input type="text" id="duel-accept-nick" maxlength="20" placeholder="Your name"
+            style="width:100%;max-width:300px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-primary);
+            padding:12px;font-size:14px;text-align:center;border-radius:4px;font-family:var(--font-body);margin:8px auto;">
+          <button class="neon-btn neon-btn-pink" style="width:100%;max-width:300px;" onclick="DialIn.duelAccept()">
+            <span class="btn-text" data-i18n="duelAccept">▶ ACCEPT CHALLENGE</span>
+          </button>
+        </div>
+
+        <!-- Duel result: challenger -->
+        <div id="duel-result" class="duel-section hidden">
+          <h2 style="font-size:22px;letter-spacing:3px;color:var(--neon-purple);margin-bottom:12px;" data-i18n="duelResultTitle">⚔ BATTLE RESULT</h2>
+          <div id="duel-result-lb" style="width:100%;max-width:400px;margin:0 auto;"></div>
+          <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+            <button class="neon-btn neon-btn-pink" onclick="DialIn.duelCreate()" data-i18n="duelRematch">🔄 REMATCH</button>
+            <button class="neon-btn" onclick="DialIn.navigate('/')" data-i18n="btnHome">🏠 HOME</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -149,6 +204,7 @@
   <script src="js/rank.js"></script>
   <script src="js/share.js"></script>
   <script src="js/daily.js"></script>
+  <script src="js/duel.js"></script>
   <script src="js/game.js"></script>
   <script src="js/app.js"></script>
 </body>

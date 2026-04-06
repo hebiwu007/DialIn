@@ -208,8 +208,13 @@
 .daily-play-btn:disabled:hover { background: transparent; box-shadow: none; }
 
 /* DUEL */
+.duel-section { display: none; flex-direction: column; align-items: center; gap: 12px; flex: 1; padding-top: 30px; }
+.duel-section:not(.hidden) { display: flex; }
+.duel-options { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
 .duel-placeholder { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
 .duel-placeholder h2 { font-size: 28px; letter-spacing: 4px; color: var(--neon-pink); }
+.duel-score-display { text-align: center; margin-bottom: 8px; }
+.duel-link-box { text-align: center; }
 
 /* FOOTER */
 .footer { display: flex; justify-content: space-between; padding: 10px 20px; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
