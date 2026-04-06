@@ -129,24 +129,18 @@ function calculateScore(original, guess) {
   const lab2 = hsbToLab(guess.h, guess.s, guess.b);
   const dE = ciede2000(lab1, lab2);
 
-  // S-curve
-  const MIDPOINT = 25.25;
-  const STEEPNESS = 1.55;
-  const baseScore = 10 / (1 + Math.pow(dE / MIDPOINT, STEEPNESS));
-
-  // Hue bonus
-  const hueDiff = Math.min(Math.abs(original.h - guess.h), 360 - Math.abs(original.h - guess.h));
-  const hueBonus = hueDiff < 30 ? 0.5 * (1 - hueDiff / 30) : 0;
-
-  const finalScore = Math.min(10, baseScore + hueBonus);
+  // S-curve — tuned so 10.0 requires near-perfect match (dE < 2)
+  // dE=0  → 10.0, dE=2 → 9.7, dE=5 → 8.5, dE=10 → 6.2, dE=20 → 2.8
+  const MIDPOINT = 12;
+  const STEEPNESS = 1.8;
+  const score = 10 / (1 + Math.pow(dE / MIDPOINT, STEEPNESS));
 
   return {
-    score: Math.round(finalScore * 100) / 100,
+    score: Math.round(score * 100) / 100,
     dE: Math.round(dE * 100) / 100,
     breakdown: {
-      baseScore: Math.round(baseScore * 100) / 100,
-      hueBonus: Math.round(hueBonus * 100) / 100,
-      hueDiff: Math.round(hueDiff * 10) / 10,
+      dE: Math.round(dE * 100) / 100,
+      hueDiff: Math.round(Math.min(Math.abs(original.h - guess.h), 360 - Math.abs(original.h - guess.h)) * 10) / 10,
       satDiff: guess.s - original.s,
       brightDiff: guess.b - original.b
     }
