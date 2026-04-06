@@ -1,0 +1,113 @@
+/* ===== Responsive ===== */
+
+/* Tablet */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 36px;
+    letter-spacing: 8px;
+  }
+
+  .mode-grid {
+    grid-template-columns: 1fr;
+    max-width: 300px;
+    margin: 0 auto 24px;
+  }
+
+  .color-slots {
+    gap: 8px;
+  }
+
+  .color-slot {
+    width: 52px;
+    height: 52px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .page {
+    padding: 12px;
+  }
+
+  /* Disable scanlines on mobile for performance */
+  .scanlines::after {
+    display: none;
+  }
+
+  .hero-title {
+    font-size: 28px;
+    letter-spacing: 6px;
+  }
+
+  .hero-subtitle {
+    font-size: 13px;
+  }
+
+  .dial-knob {
+    width: 60px;
+    height: 60px;
+  }
+
+  .nav-bar {
+    padding: 10px 12px;
+  }
+
+  .nav-title {
+    font-size: 14px;
+    letter-spacing: 3px;
+  }
+
+  .color-slot {
+    width: 48px;
+    height: 48px;
+  }
+
+  .color-preview {
+    width: 120px;
+    height: 90px;
+  }
+
+  .slider-row {
+    gap: 8px;
+  }
+
+  .neon-slider {
+    height: 10px;
+  }
+
+  .neon-slider::-webkit-slider-thumb {
+    width: 32px;
+    height: 32px;
+  }
+
+  .neon-slider::-moz-range-thumb {
+    width: 32px;
+    height: 32px;
+  }
+
+  .dial-in-btn {
+    font-size: 15px;
+    padding: 14px 36px;
+  }
+
+  .results-total {
+    font-size: 28px;
+  }
+
+  .results-actions {
+    flex-direction: column;
+  }
+
+  .results-actions .neon-btn {
+    width: 100%;
+  }
+
+  .personality-stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .footer {
+    font-size: 10px;
+  }
+}

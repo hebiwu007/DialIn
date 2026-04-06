@@ -1,0 +1,128 @@
+/* ===== Cyberpunk Effects ===== */
+
+/* Scanlines overlay */
+.scanlines::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.08) 0px,
+    rgba(0, 0, 0, 0.08) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  z-index: var(--z-scanlines);
+  animation: scanlineMove 8s linear infinite;
+}
+
+@keyframes scanlineMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(3px); }
+}
+
+/* Matrix rain background */
+#matrix-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0.15;
+}
+
+/* Glitch effect for text */
+.glitch {
+  position: relative;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch::before {
+  color: var(--neon-cyan);
+  animation: glitch-1 3s infinite linear alternate-reverse;
+  clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+}
+
+.glitch::after {
+  color: var(--neon-pink);
+  animation: glitch-2 3s infinite linear alternate-reverse;
+  clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+}
+
+@keyframes glitch-1 {
+  0%, 95% { transform: translateX(0); }
+  96% { transform: translateX(-3px) skewX(-1deg); }
+  97% { transform: translateX(3px) skewX(1deg); }
+  98% { transform: translateX(-1px); }
+  99% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes glitch-2 {
+  0%, 95% { transform: translateX(0); }
+  96% { transform: translateX(3px) skewX(1deg); }
+  97% { transform: translateX(-3px) skewX(-1deg); }
+  98% { transform: translateX(1px); }
+  99% { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
+}
+
+/* Page transition glitch */
+.page-transition {
+  animation: glitchTransition 0.3s ease-in-out;
+}
+
+@keyframes glitchTransition {
+  0% { transform: translate(0); filter: hue-rotate(0deg); }
+  20% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+  40% { transform: translate(2px, -2px); filter: hue-rotate(180deg); }
+  60% { transform: translate(-1px, -1px); filter: hue-rotate(270deg); }
+  80% { transform: translate(1px, 1px); filter: hue-rotate(360deg); }
+  100% { transform: translate(0); filter: hue-rotate(0deg); }
+}
+
+/* Neon glow pulse */
+@keyframes neonPulse {
+  0%, 100% {
+    text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green-glow);
+  }
+  50% {
+    text-shadow: 0 0 20px var(--neon-green), 0 0 40px var(--neon-green-glow), 0 0 60px var(--neon-green-dim);
+  }
+}
+
+@keyframes neonPulseCyan {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--neon-cyan), 0 0 10px var(--neon-cyan-dim);
+  }
+  50% {
+    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan-glow), 0 0 30px var(--neon-cyan-dim);
+  }
+}
+
+/* Flicker effect */
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  41% { opacity: 1; }
+  42% { opacity: 0.8; }
+  43% { opacity: 1; }
+  45% { opacity: 0.3; }
+  46% { opacity: 1; }
+  50% { opacity: 1; }
+  51% { opacity: 0.6; }
+  52% { opacity: 1; }
+}

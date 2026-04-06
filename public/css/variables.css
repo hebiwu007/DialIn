@@ -1,0 +1,56 @@
+/* ===== DialIn CSS Variables — Cyberpunk Theme ===== */
+:root {
+  /* Backgrounds */
+  --bg-primary: #0A0A0F;
+  --bg-secondary: #12121A;
+  --bg-card: #1A1A2E;
+  --bg-hover: #222240;
+  --border: #2A2A3E;
+  --border-light: #3A3A5E;
+
+  /* Neon Accent Colors */
+  --neon-cyan: #00F0FF;
+  --neon-cyan-dim: #00F0FF40;
+  --neon-cyan-glow: #00F0FF80;
+  --neon-pink: #FF0066;
+  --neon-pink-dim: #FF006640;
+  --neon-pink-glow: #FF006680;
+  --neon-purple: #A855F7;
+  --neon-purple-dim: #A855F740;
+  --neon-purple-glow: #A855F780;
+  --neon-green: #00FF88;
+  --neon-green-dim: #00FF8840;
+  --neon-green-glow: #00FF8880;
+  --neon-yellow: #FFE500;
+  --neon-yellow-dim: #FFE50040;
+  --neon-yellow-glow: #FFE50080;
+  --neon-orange: #FF6B00;
+  --neon-orange-dim: #FF6B0040;
+
+  /* Text */
+  --text-primary: #E0E0FF;
+  --text-secondary: #6B7294;
+  --text-muted: #3D4466;
+  --text-accent: #00F0FF;
+
+  /* Fonts */
+  --font-display: 'Orbitron', sans-serif;
+  --font-body: 'Exo 2', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Sizes */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* Z-index layers */
+  --z-base: 1;
+  --z-overlay: 10;
+  --z-modal: 100;
+  --z-scanlines: 9999;
+}
