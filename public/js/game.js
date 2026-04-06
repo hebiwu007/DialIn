@@ -73,6 +73,9 @@ class GameEngine {
     const el = document.getElementById('show-color');
     el.style.backgroundColor = `rgb(${rgb.r},${rgb.g},${rgb.b})`;
 
+    // Level 5 distractors: show distracting colors around the target
+    this._renderDistractors();
+
     const timerEl = document.getElementById('show-timer-value');
     const ring = document.getElementById('show-timer-ring');
     ring.classList.remove('warning');
@@ -85,8 +88,51 @@ class GameEngine {
       left--;
       timerEl.textContent = (left/10).toFixed(1);
       if (left <= 30) { ring.classList.add('warning'); if (left%10===0) audio.play('warning'); }
-      if (left <= 0) { clearInterval(this.timer); this._startGuess(); }
+      if (left <= 0) { clearInterval(this.timer); this._clearDistractors(); this._startGuess(); }
     }, 100);
+  }
+
+  _renderDistractors() {
+    this._clearDistractors();
+    const cfg = this.mode === 'daily' || this.mode === 'duel' ? { hasDistractors: false } : getLevelConfig(this.level);
+    if (!cfg.hasDistractors) return;
+
+    const target = this.colors[this.currentRound];
+    const container = document.getElementById('show-color').parentElement;
+    if (!container) return;
+
+    const distractorWrap = document.createElement('div');
+    distractorWrap.id = 'distractor-colors';
+    distractorWrap.style.cssText = 'display:flex;gap:10px;justify-content:center;margin-top:14px;';
+
+    // Generate 3 distractor colors that are somewhat similar to the target
+    for (let i = 0; i < 3; i++) {
+      const dColor = this._generateDistractorColor(target);
+      const dRgb = hsbToRgb(dColor.h, dColor.s, dColor.b);
+      const block = document.createElement('div');
+      block.style.cssText = `width:60px;height:60px;border-radius:8px;background:rgb(${dRgb.r},${dRgb.g},${dRgb.b});
+        border:2px solid var(--border);opacity:0.7;`;
+      distractorWrap.appendChild(block);
+    }
+
+    container.appendChild(distractorWrap);
+  }
+
+  _generateDistractorColor(target) {
+    // Create a color that's visually similar but different enough to confuse
+    const hueShift = (Math.random() > 0.5 ? 1 : -1) * (20 + Math.random() * 40);
+    const satShift = (Math.random() > 0.5 ? 1 : -1) * (10 + Math.random() * 20);
+    const briShift = (Math.random() > 0.5 ? 1 : -1) * (10 + Math.random() * 15);
+    return {
+      h: (target.h + hueShift + 360) % 360,
+      s: Math.min(100, Math.max(10, target.s + satShift)),
+      b: Math.min(100, Math.max(10, target.b + briShift)),
+    };
+  }
+
+  _clearDistractors() {
+    const existing = document.getElementById('distractor-colors');
+    if (existing) existing.remove();
   }
 
   _startGuess() {
