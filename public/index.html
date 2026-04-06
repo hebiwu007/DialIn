@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DialIn — Dial In Your Colors | Cyberpunk Color Memory Game</title>
-  <meta name="description" content="A cyberpunk color memory game where you dial in colors from memory. Solo, daily challenges, multiplayer. Track your color bias and climb the ranks.">
+  <title>DialIn — Dial In Your Colors</title>
+  <meta name="description" content="A cyberpunk color memory game. Remember colors, recreate them, see how close you get.">
   <meta property="og:title" content="DialIn — Dial In Your Colors">
   <meta property="og:description" content="A cyberpunk color memory game. How close can you dial in?">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
@@ -16,27 +16,19 @@
   <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body class="scanlines">
-  <!-- Matrix Rain Background -->
   <canvas id="matrix-bg"></canvas>
+  <button class="lang-switch" id="lang-toggle">中文</button>
 
-  <!-- Language Toggle -->
-  <button class="lang-switch" id="lang-toggle" title="Switch Language">中文</button>
-
-  <!-- Main App -->
   <div id="app">
-    <!-- Navigation -->
     <nav class="nav-bar">
-      <div class="nav-brand">
-        <span class="nav-logo">◉</span>
-        <span class="nav-title">DIALIN</span>
-      </div>
+      <div class="nav-brand"><span class="nav-logo">◉</span><span class="nav-title">DIALIN</span></div>
       <div class="nav-right">
-        <span class="rank-badge" id="rank-badge">🥉 Bronze IV</span>
-        <button class="nav-lang lang-switch" title="Switch Language">中文</button>
+        <span class="nav-level" id="nav-level">Level 1</span>
+        <button class="nav-lang lang-switch">中文</button>
       </div>
     </nav>
 
-    <!-- ===== PAGE: HOME ===== -->
+    <!-- HOME -->
     <section id="page-home" class="page active">
       <div class="hero">
         <div class="dial-knob"><div class="dial-indicator"></div></div>
@@ -44,142 +36,111 @@
         <p class="hero-subtitle" data-i18n="heroSubtitle">Dial In Your Colors</p>
         <p class="hero-desc" data-i18n="heroDesc">Remember colors. Recreate them. See how close you get.</p>
       </div>
-
       <div class="mode-grid">
-        <button class="neon-btn neon-btn-cyan mode-card" onclick="DialIn.navigate('/free')">
+        <button class="neon-btn neon-btn-cyan" onclick="DialIn.navigate('/free')">
           <span class="btn-icon">▶</span>
-          <span class="btn-text" data-i18n="modeFreeText">FREE DIAL</span>
+          <span class="btn-text" data-i18n="modeFree">FREE DIAL</span>
           <span class="btn-sub" data-i18n="modeFreeSub">Solo Practice</span>
         </button>
-        <button class="neon-btn neon-btn-purple mode-card" onclick="DialIn.navigate('/daily')">
+        <button class="neon-btn neon-btn-purple" onclick="DialIn.navigate('/daily')">
           <span class="btn-icon">☀</span>
-          <span class="btn-text" data-i18n="modeDailyText">DAILY DIAL</span>
+          <span class="btn-text" data-i18n="modeDaily">DAILY DIAL</span>
           <span class="btn-sub" data-i18n="modeDailySub">Today's Challenge</span>
         </button>
-        <button class="neon-btn neon-btn-pink mode-card" onclick="DialIn.navigate('/duel')">
+        <button class="neon-btn neon-btn-pink" onclick="DialIn.navigate('/duel')">
           <span class="btn-icon">⚔</span>
-          <span class="btn-text" data-i18n="modeDuelText">DUEL</span>
-          <span class="btn-sub" data-i18n="modeDuelSub">Multiplayer</span>
+          <span class="btn-text" data-i18n="modeDuel">DUEL</span>
+          <span class="btn-sub" data-i18n="modeDuelSub">Challenge Friends</span>
         </button>
       </div>
-
-      <div class="home-stats cyber-panel">
-        <div class="stat-row">
-          <span class="stat-label" data-i18n="labelRank">DIALRANK</span>
-          <span class="stat-value" id="home-rank">🥉 Bronze IV</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-label" data-i18n="labelRating">RATING</span>
-          <span class="stat-value mono" id="home-rating">0 / 400</span>
-        </div>
-        <div class="rating-bar"><div class="rating-bar-fill" id="home-rating-bar" style="width:0%"></div></div>
-        <div class="stat-row">
-          <span class="stat-label" data-i18n="labelStreak">STREAK</span>
-          <span class="stat-value" id="home-streak">—</span>
-        </div>
+      <div class="home-level-panel cyber-panel">
+        <div class="level-info" id="home-level-info">Level 1 · 2 colors · 10s</div>
+        <div class="level-bar"><div class="level-bar-fill" id="home-level-bar"></div></div>
+        <div class="level-next" id="home-level-next">Next: Level 2 · 3 colors · 8s</div>
+        <div class="level-streak" id="home-streak"></div>
       </div>
     </section>
 
-    <!-- ===== PAGE: GAME ===== -->
+    <!-- GAME -->
     <section id="page-game" class="page">
+      <div class="game-progress" id="game-progress">
+        <span class="progress-dots" id="progress-dots"></span>
+        <button class="game-exit" onclick="DialIn.navigate('/')">✕</button>
+      </div>
 
-      <!-- === MEMORIZE PHASE === -->
-      <div class="game-phase" id="phase-memorize">
-        <div class="phase-instruction">
-          <span class="instruction-icon">🧠</span>
-          <span class="instruction-text" data-i18n="instructionMemorize">Remember these colors</span>
-        </div>
-        <div class="color-slots" id="color-slots"></div>
-        <div class="timer-big">
-          <span class="timer-ring">
-            <span class="timer-value" id="timer-value">10.0</span>
-          </span>
-        </div>
-        <div class="timer-bar-wrap">
-          <div class="progress-bar"><div class="progress-fill" id="display-progress-fill"></div></div>
+      <!-- SHOWING -->
+      <div class="game-phase" id="phase-show">
+        <div class="phase-hint" data-i18n="hintRemember">Remember this color</div>
+        <div class="show-color" id="show-color"></div>
+        <div class="show-timer-ring" id="show-timer-ring">
+          <span class="show-timer-value" id="show-timer-value">5.0</span>
         </div>
       </div>
 
-      <!-- === GUESS PHASE === -->
+      <!-- GUESSING -->
       <div class="game-phase hidden" id="phase-guess">
-        <div class="phase-instruction">
-          <span class="instruction-icon">🎯</span>
-          <span class="instruction-text" id="guess-instruction">Recreate color 1 of 5</span>
-        </div>
-
-        <!-- Target hint (small swatch, hidden after a few plays) -->
-        <div class="guess-layout">
-          <!-- Big live preview -->
-          <div class="guess-preview-wrap">
-            <div class="guess-preview" id="color-preview"></div>
+        <div class="phase-hint" id="guess-hint" data-i18n="hintRecreate">Recreate this color</div>
+        <div class="guess-preview" id="color-preview"></div>
+        <div class="guess-sliders">
+          <div class="slider-row">
+            <span class="slider-label" data-i18n="labelHue">Color</span>
+            <input type="range" id="slider-h" class="neon-slider hue-track" min="0" max="360" value="180">
           </div>
-
-          <!-- One big slider area -->
-          <div class="slider-area">
-            <div class="slider-row">
-              <span class="slider-label" data-i18n="labelHue">Color</span>
-              <input type="range" id="slider-h" class="neon-slider hue-track" min="0" max="360" value="180">
-            </div>
-            <div class="slider-row">
-              <span class="slider-label" data-i18n="labelSat">Vividness</span>
-              <input type="range" id="slider-s" class="neon-slider sat-track" min="0" max="100" value="80">
-            </div>
-            <div class="slider-row">
-              <span class="slider-label" data-i18n="labelBri">Brightness</span>
-              <input type="range" id="slider-b" class="neon-slider bri-track" min="0" max="100" value="90">
-            </div>
+          <div class="slider-row">
+            <span class="slider-label" data-i18n="labelSat">Vividness</span>
+            <input type="range" id="slider-s" class="neon-slider sat-track" min="0" max="100" value="80">
           </div>
-
-          <!-- Submit -->
-          <button class="neon-btn neon-btn-cyan submit-btn" id="btn-dial-in">
-            <span data-i18n="btnConfirm">✓ CONFIRM</span>
-          </button>
+          <div class="slider-row">
+            <span class="slider-label" data-i18n="labelBri">Brightness</span>
+            <input type="range" id="slider-b" class="neon-slider bri-track" min="0" max="100" value="90">
+          </div>
         </div>
+        <button class="neon-btn neon-btn-cyan guess-submit" id="btn-confirm" data-i18n="btnConfirm">✓ CONFIRM</button>
       </div>
 
-      <!-- === RESULT PHASE (single round feedback) === -->
-      <div class="game-phase hidden" id="phase-round-result">
-        <div class="round-feedback" id="round-feedback">
-          <!-- Filled by JS -->
-        </div>
-        <button class="neon-btn neon-btn-cyan submit-btn" id="btn-next-round">
-          <span data-i18n="btnNext">NEXT →</span>
-        </button>
+      <!-- COMPARING -->
+      <div class="game-phase hidden" id="phase-compare">
+        <div class="compare-wrap" id="compare-wrap"></div>
+        <button class="neon-btn neon-btn-cyan guess-submit" id="btn-next" data-i18n="btnNext">NEXT →</button>
       </div>
 
-      <!-- === FINAL RESULTS === -->
-      <div class="game-phase hidden" id="phase-results">
-        <div class="results-container" id="results-container"></div>
-        <div class="results-actions">
-          <button class="neon-btn neon-btn-cyan" data-i18n="btnShare" onclick="DialIn.shareResult()">📤 SHARE</button>
-          <button class="neon-btn neon-btn-purple" data-i18n="btnAgain" onclick="DialIn.playAgain()">🔄 AGAIN</button>
-          <button class="neon-btn" data-i18n="btnHome" onclick="DialIn.navigate('/')">🏠 HOME</button>
+      <!-- SUMMARY -->
+      <div class="game-phase hidden" id="phase-summary">
+        <div class="summary-wrap" id="summary-wrap"></div>
+        <div class="summary-actions">
+          <button class="neon-btn neon-btn-cyan" onclick="DialIn.shareResult()" data-i18n="btnShare">📤 SHARE</button>
+          <button class="neon-btn neon-btn-purple" onclick="DialIn.playAgain()" data-i18n="btnAgain">🔄 AGAIN</button>
+          <button class="neon-btn" onclick="DialIn.navigate('/')" data-i18n="btnHome">🏠 HOME</button>
         </div>
       </div>
-
     </section>
 
-    <!-- ===== PAGE: DAILY ===== -->
+    <!-- DAILY -->
     <section id="page-daily" class="page">
       <div class="daily-header">
-        <h2>☀ <span data-i18n="dailyTitle">DAILY DIAL</span></h2>
+        <h2 data-i18n="dailyTitle">☀ DAILY DIAL</h2>
         <span class="daily-date mono" id="daily-date"></span>
         <span class="daily-theme" id="daily-theme"></span>
       </div>
+      <div class="daily-result cyber-panel hidden" id="daily-result"></div>
       <div class="daily-leaderboard cyber-panel" id="daily-leaderboard"></div>
-      <button class="neon-btn neon-btn-purple daily-play-btn" id="btn-daily-play" data-i18n="dailyPlay">
-        ▶ PLAY TODAY'S CHALLENGE
-      </button>
+      <button class="neon-btn neon-btn-purple daily-play-btn" id="btn-daily-play" onclick="DialIn.startDaily()" data-i18n="dailyPlay">▶ PLAY TODAY'S CHALLENGE</button>
     </section>
 
-    <!-- Footer -->
+    <!-- DUEL -->
+    <section id="page-duel" class="page">
+      <div class="duel-placeholder">
+        <h2>⚔ DUEL</h2>
+        <p data-i18n="duelComing">Coming Soon</p>
+        <button class="neon-btn" onclick="DialIn.navigate('/')" data-i18n="btnHome">🏠 HOME</button>
+      </div>
+    </section>
+
     <footer class="footer">
-      <span class="footer-brand">DIALIN.GG</span>
-      <span class="footer-version">v1.0</span>
+      <span>DIALIN.GG</span><span>v3.0</span>
     </footer>
   </div>
 
-  <!-- Scripts -->
   <script src="js/scoring.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/audio.js"></script>

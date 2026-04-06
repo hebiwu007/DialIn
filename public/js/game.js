@@ -1,284 +1,219 @@
 /**
- * DialIn — Game Engine v2 (Simpler UX)
- * Flow: Memorize → Guess one-by-one → Round feedback → Next → Final Results
+ * DialIn — Game Engine v3
+ * Flow: show color → countdown → guess → compare → next → summary
  */
-
-const DIFFICULTY = {
-  tutorial: { name: '教程', colorCount: 2, showTime: 10, icon: '🎒' },
-  easy:     { name: '简单', colorCount: 3, showTime: 8,  icon: '🟢' },
-  medium:   { name: '普通', colorCount: 4, showTime: 5,  icon: '🟡' },
-  hard:     { name: '困难', colorCount: 5, showTime: 3,  icon: '🔴' },
-  expert:   { name: '专家', colorCount: 5, showTime: 2,  icon: '💀' }
-};
-
 class GameEngine {
   constructor() {
-    this.colors = [];
-    this.guesses = [];
-    this.currentRound = 0;
-    this.phase = 'idle';
-    this.mode = 'free';
-    this.difficulty = 'medium';
-    this.timer = null;
-    this.results = null;
-    this.biasHistory = [];
+    this.colors = []; this.guesses = []; this.currentRound = 0;
+    this.phase = 'idle'; this.mode = 'free'; this.level = 1;
+    this.timer = null; this.results = null; this.biasHistory = [];
   }
 
-  start(mode, difficulty) {
-    this.mode = mode;
-    this.difficulty = difficulty || 'medium';
-    this.currentRound = 0;
-    this.guesses = [];
-    this.phase = 'memorize';
+  start(mode, level) {
+    this.mode = mode; this.level = level || getPlayerLevel();
+    this.currentRound = 0; this.guesses = []; this.biasHistory = [];
+    this.phase = 'show';
 
-    const config = DIFFICULTY[this.difficulty];
+    const cfg = mode === 'daily' ? { colors: 5, showTime: 5 } : getLevelConfig(this.level);
 
     if (mode === 'daily') {
-      const daily = generateDailyColors(getDailyDate());
-      this.colors = daily.colors;
+      this.colors = generateDailyColors(getDailyDate()).colors;
     } else {
-      this.colors = this._generateColors(config.colorCount);
+      this.colors = [];
+      for (let i = 0; i < cfg.colors; i++) {
+        this.colors.push({ h: Math.floor(Math.random()*360), s: 20+Math.floor(Math.random()*80), b: 20+Math.floor(Math.random()*80) });
+      }
     }
 
     const data = loadPlayerData();
     this.biasHistory = data.biasHistory || [];
 
-    this._renderColorSlots();
-    this._showPhase('phase-memorize');
-    this._startCountdown(config.showTime);
+    this._renderProgress();
+    this._showPhase('phase-show');
+    this._showColor(cfg.showTime);
   }
 
-  _generateColors(count) {
-    const colors = [];
-    for (let i = 0; i < count; i++) {
-      colors.push({
-        h: Math.floor(Math.random() * 360),
-        s: 20 + Math.floor(Math.random() * 80),
-        b: 20 + Math.floor(Math.random() * 80)
-      });
-    }
-    return colors;
-  }
-
-  _renderColorSlots() {
-    const container = document.getElementById('color-slots');
+  _renderProgress() {
+    const container = document.getElementById('progress-dots');
     container.innerHTML = '';
-    this.colors.forEach((color, i) => {
-      const slot = document.createElement('div');
-      slot.className = 'color-slot slot-appear';
-      slot.id = `slot-${i}`;
-      const rgb = hsbToRgb(color.h, color.s, color.b);
-      slot.style.backgroundColor = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-      slot.style.animationDelay = (i * 0.08) + 's';
-      container.appendChild(slot);
-    });
+    for (let i = 0; i < this.colors.length; i++) {
+      const dot = document.createElement('span');
+      dot.className = 'progress-dot';
+      dot.id = `dot-${i}`;
+      container.appendChild(dot);
+    }
+    this._updateProgress();
   }
 
-  _startCountdown(seconds) {
-    const timerEl = document.getElementById('timer-value');
-    const timerRing = timerEl.parentElement;
-    const progressBar = document.getElementById('display-progress-fill');
-    timerRing.classList.remove('warning');
+  _updateProgress() {
+    for (let i = 0; i < this.colors.length; i++) {
+      const dot = document.getElementById(`dot-${i}`);
+      if (!dot) continue;
+      dot.className = 'progress-dot';
+      if (i < this.currentRound) dot.classList.add('done');
+      else if (i === this.currentRound) dot.classList.add('active');
+    }
+  }
 
-    let timeLeft = seconds * 10;
-    const totalTime = timeLeft;
+  _showColor(seconds) {
+    const color = this.colors[this.currentRound];
+    const rgb = hsbToRgb(color.h, color.s, color.b);
+    const el = document.getElementById('show-color');
+    el.style.backgroundColor = `rgb(${rgb.r},${rgb.g},${rgb.b})`;
+
+    const timerEl = document.getElementById('show-timer-value');
+    const ring = document.getElementById('show-timer-ring');
+    ring.classList.remove('warning');
+
+    let left = seconds * 10;
+    const total = left;
+    timerEl.textContent = (left/10).toFixed(1);
 
     this.timer = setInterval(() => {
-      timeLeft--;
-      timerEl.textContent = (timeLeft / 10).toFixed(1);
-      progressBar.style.width = (timeLeft / totalTime * 100) + '%';
-
-      if (timeLeft <= 30) {
-        timerRing.classList.add('warning');
-        if (timeLeft % 10 === 0) audio.play('warning');
-      }
-      if (timeLeft <= 0) {
-        clearInterval(this.timer);
-        this._startGuessPhase();
-      }
+      left--;
+      timerEl.textContent = (left/10).toFixed(1);
+      if (left <= 30) { ring.classList.add('warning'); if (left%10===0) audio.play('warning'); }
+      if (left <= 0) { clearInterval(this.timer); this._startGuess(); }
     }, 100);
   }
 
-  _startGuessPhase() {
+  _startGuess() {
     this.phase = 'guess';
-
-    // Update instruction
-    const instrEl = document.getElementById('guess-instruction');
-    instrEl.textContent = i18n.t('guessInstruction', { current: this.currentRound + 1, total: this.colors.length });
-
-    // Update slot indicators
-    this.colors.forEach((_, i) => {
-      const slot = document.getElementById(`slot-${i}`);
-      if (!slot) return;
-      slot.className = 'color-slot';
-      if (i < this.currentRound) slot.classList.add('done');
-      else if (i === this.currentRound) slot.classList.add('active');
-      else slot.classList.add('pending');
-      if (i >= this.currentRound) slot.style.backgroundColor = 'var(--bg-card)';
-    });
-
-    // Reset picker
     colorPicker.bind();
     colorPicker.reset(180, 50, 50);
-
+    this._updateProgress();
     this._showPhase('phase-guess');
   }
 
   submitGuess() {
     if (this.phase !== 'guess') return;
-
     const guess = colorPicker.getColor();
     const original = this.colors[this.currentRound];
     const result = calculateScore(original, guess);
 
-    // Sound
     if (result.score >= 7) audio.play('highScore');
     else if (result.score < 4) audio.play('lowScore');
     else audio.play('confirm');
 
-    // Collect bias
     this.biasHistory.push(collectBiasData(original, guess));
+    this.guesses.push({ original, guess, score: result.score, dE: result.dE });
 
-    this.guesses.push({ original, guess, score: result.score, dE: result.dE, breakdown: result.breakdown });
-
-    // Show round feedback
-    this._showRoundResult(original, guess, result.score);
+    this._showCompare(original, guess, result.score);
   }
 
-  _showRoundResult(original, guess, score) {
-    this.phase = 'round-result';
+  _showCompare(original, guess, score) {
+    this.phase = 'compare';
+    const rgbO = hsbToRgb(original.h, original.s, original.b);
+    const rgbG = hsbToRgb(guess.h, guess.s, guess.b);
+    const cls = score >= 7 ? 'high' : score >= 4 ? 'mid' : 'low';
 
-    const container = document.getElementById('round-feedback');
-    const rgbOrig = hsbToRgb(original.h, original.s, original.b);
-    const rgbGuess = hsbToRgb(guess.h, guess.s, guess.b);
-    const scoreClass = score >= 7 ? 'high' : score >= 4 ? 'mid' : 'low';
-
-    container.innerHTML = `
-      <div class="round-compare fade-in">
-        <div class="round-swatch" style="background:rgb(${rgbOrig.r},${rgbOrig.g},${rgbOrig.b})"></div>
-        <span class="round-vs">VS</span>
-        <div class="round-swatch" style="background:rgb(${rgbGuess.r},${rgbGuess.g},${rgbGuess.b})"></div>
+    document.getElementById('compare-wrap').innerHTML = `
+      <div class="compare-pair fade-in">
+        <div class="compare-swatch" style="background:rgb(${rgbO.r},${rgbO.g},${rgbO.b})">
+          <span class="compare-label" data-i18n="labelOriginal">ORIGINAL</span>
+        </div>
+        <span class="compare-vs">VS</span>
+        <div class="compare-swatch" style="background:rgb(${rgbG.r},${rgbG.g},${rgbG.b})">
+          <span class="compare-label" data-i18n="labelYours">YOURS</span>
+        </div>
       </div>
-      <div class="round-score-big score-reveal ${scoreClass}">${score.toFixed(1)}</div>
-      <div class="round-score-label">${i18n.t('roundScoreLabel')}</div>
-    `;
+      <div class="compare-score score-reveal ${cls}">${score.toFixed(1)}</div>
+      <div class="compare-out-of">/ 10</div>`;
 
-    // Update "next" button text
-    const nextBtn = document.getElementById('btn-next-round');
-    const isLast = this.currentRound >= this.colors.length - 1;
-    nextBtn.querySelector('span').textContent = isLast ? i18n.t('btnSeeResults') : i18n.t('btnNext');
-
-    this._showPhase('phase-round-result');
+    const nextBtn = document.getElementById('btn-next');
+    nextBtn.textContent = (this.currentRound >= this.colors.length - 1) ? i18n.t('btnSummary') : i18n.t('btnNext');
+    this._showPhase('phase-compare');
   }
 
   nextRound() {
     this.currentRound++;
     if (this.currentRound >= this.colors.length) {
-      this._showFinalResults();
+      this._showSummary();
     } else {
-      this._startGuessPhase();
+      this.phase = 'show';
+      this._updateProgress();
+      this._showPhase('phase-show');
+      const cfg = this.mode === 'daily' ? { showTime: 5 } : getLevelConfig(this.level);
+      this._showColor(cfg.showTime);
     }
   }
 
-  _showFinalResults() {
-    this.phase = 'results';
+  _showSummary() {
+    this.phase = 'summary';
     audio.play('complete');
 
-    const totalScore = this.guesses.reduce((s, g) => s + g.score, 0);
-    const maxScore = this.colors.length * 10;
-    const scorePercent = totalScore / maxScore;
-    const biasAnalysis = analyzeColorBias(this.biasHistory);
-    const ratingChange = calculateRatingChange(scorePercent, this.difficulty, this.mode === 'daily', getPlayerRating());
-    const oldRating = getPlayerRating();
-    const newRating = Math.max(0, oldRating + ratingChange);
-    const rank = getRank(newRating);
+    const total = this.guesses.reduce((s,g) => s+g.score, 0);
+    const max = this.colors.length * 10;
+    const pct = total / max;
+    const bias = analyzeColorBias(this.biasHistory);
 
-    // Save
-    const data = loadPlayerData();
-    data.rating = newRating;
-    data.biasHistory = this.biasHistory.slice(-50);
-    savePlayerData(data);
-    if (this.mode === 'daily') markDailyPlayed(totalScore);
+    // Record & check level
+    recordGame(pct, this.level);
     updateStreak();
+    const levelChange = this.mode === 'free' ? checkLevelChange() : null;
 
-    this.results = {
-      mode: this.mode, difficulty: this.difficulty,
-      rounds: this.guesses, totalScore: Math.round(totalScore * 10) / 10,
-      maxScore, personality: biasAnalysis.personality,
-      ratingChange, newRating,
-      rank: `${rank.icon} ${rank.tier} ${rank.division}`,
-      streak: getPlayerStreak()
-    };
-
-    // Render
-    const container = document.getElementById('results-container');
-    container.innerHTML = '';
-
-    // Title
-    const title = document.createElement('h2');
-    title.className = 'results-title slide-up';
-    title.textContent = i18n.t('resultsTitle');
-    container.appendChild(title);
-
-    // Color pairs
-    const colorsDiv = document.createElement('div');
-    colorsDiv.className = 'results-colors stagger-children';
-    this.guesses.forEach((round) => {
-      const pair = document.createElement('div');
-      pair.className = 'result-pair';
-      const rgbO = hsbToRgb(round.original.h, round.original.s, round.original.b);
-      const rgbG = hsbToRgb(round.guess.h, round.guess.s, round.guess.b);
-      const sc = round.score >= 7 ? 'high' : round.score >= 4 ? 'mid' : 'low';
-      pair.innerHTML = `
-        <div class="result-original" style="background:rgb(${rgbO.r},${rgbO.g},${rgbO.b})"></div>
-        <div class="result-guess" style="background:rgb(${rgbG.r},${rgbG.g},${rgbG.b})"></div>
-        <span class="result-score ${sc}">${round.score.toFixed(1)}</span>`;
-      colorsDiv.appendChild(pair);
+    const container = document.getElementById('summary-wrap');
+    let html = `<h2 class="summary-title slide-up">${i18n.t('summaryTitle')}</h2><div class="summary-colors stagger-children">`;
+    this.guesses.forEach(r => {
+      const o = hsbToRgb(r.original.h,r.original.s,r.original.b);
+      const g = hsbToRgb(r.guess.h,r.guess.s,r.guess.b);
+      const sc = r.score>=7?'high':r.score>=4?'mid':'low';
+      html += `<div class="summary-pair">
+        <div class="summary-swatch" style="background:rgb(${o.r},${o.g},${o.b})"></div>
+        <div class="summary-swatch" style="background:rgb(${g.r},${g.g},${g.b})"></div>
+        <span class="summary-score ${sc}">${r.score.toFixed(1)}</span></div>`;
     });
-    container.appendChild(colorsDiv);
+    html += `</div>`;
+    html += `<div class="slide-up"><div class="summary-total">${total.toFixed(1)}</div><div class="summary-total-label">${i18n.t('outOf',{max})}</div></div>`;
 
-    // Total
-    const totalDiv = document.createElement('div');
-    totalDiv.className = 'slide-up';
-    totalDiv.innerHTML = `<div class="results-total">${totalScore.toFixed(1)}</div><div class="results-total-label">${i18n.t('resultsOutof', { max: maxScore })}</div>`;
-    container.appendChild(totalDiv);
+    const bc = pct>=0.7?'var(--neon-green)':pct>=0.4?'var(--neon-yellow)':'var(--neon-pink)';
+    html += `<div class="summary-bar"><div class="summary-bar-fill" style="background:${bc};box-shadow:0 0 8px ${bc}"></div></div>`;
 
-    // Bar
-    const barDiv = document.createElement('div');
-    barDiv.className = 'results-bar';
-    const barFill = document.createElement('div');
-    barFill.className = 'results-bar-fill';
-    const bc = scorePercent >= 0.7 ? 'var(--neon-green)' : scorePercent >= 0.4 ? 'var(--neon-yellow)' : 'var(--neon-pink)';
-    barFill.style.background = bc;
-    barFill.style.boxShadow = `0 0 8px ${bc}`;
-    setTimeout(() => { barFill.style.width = (scorePercent * 100) + '%'; }, 100);
-    barDiv.appendChild(barFill);
-    container.appendChild(barDiv);
+    html += `<div class="summary-personality cyber-panel fade-in">
+      <div class="personality-name">${bias.personality.name}</div>
+      <div class="personality-desc">${bias.personality.desc}</div></div>`;
 
-    // Personality
-    const persDiv = document.createElement('div');
-    persDiv.className = 'results-personality cyber-panel fade-in';
-    persDiv.innerHTML = `
-      <div class="personality-name">${biasAnalysis.personality.name}</div>
-      <div class="personality-desc">${biasAnalysis.personality.desc}</div>
-      <div class="personality-stats">
-        <div class="personality-stat"><span class="personality-stat-label">${i18n.t('labelRatingChange')}</span><span class="personality-stat-value">${ratingChange >= 0 ? '+' : ''}${ratingChange}</span></div>
-        <div class="personality-stat"><span class="personality-stat-label">${i18n.t('labelRankShort')}</span><span class="personality-stat-value">${rank.icon} ${rank.tier} ${rank.division}</span></div>
-        <div class="personality-stat"><span class="personality-stat-label">${i18n.t('labelStreakShort')}</span><span class="personality-stat-value">${i18n.t('streakDay', { n: getPlayerStreak() })}</span></div>
-      </div>`;
-    container.appendChild(persDiv);
+    const streak = getPlayerStreak();
+    if (streak > 0) html += `<div class="level-streak">${i18n.t('streakDay',{n:streak})}</div>`;
 
-    this._showPhase('phase-results');
+    container.innerHTML = html;
+    this._showPhase('phase-summary');
+
+    // Animate bar
+    setTimeout(() => { const fill = container.querySelector('.summary-bar-fill'); if (fill) fill.style.width = (pct*100)+'%'; }, 100);
+
+    // Level change overlay
+    if (levelChange) this._showLevelOverlay(levelChange);
+
+    // Save for sharing
+    this.results = { mode:this.mode, level:this.level, rounds:this.guesses, totalScore:Math.round(total*10)/10, maxScore:max, personality:bias.personality, streak, levelChange };
+
     updateNavStats();
   }
 
-  _showPhase(phaseId) {
+  _showLevelOverlay(change) {
+    const overlay = document.createElement('div');
+    overlay.className = 'level-overlay';
+    const isUp = change.type === 'up';
+    const color = isUp ? 'var(--neon-green)' : 'var(--neon-yellow)';
+    const title = isUp ? i18n.t('levelUp') : i18n.t('levelDown');
+    const oldDesc = getLevelDescription(change.oldLevel);
+    const newDesc = getLevelUpDescription(change.newLevel);
+    overlay.innerHTML = `<div class="level-overlay-content" style="border-color:${color}">
+      <div class="level-overlay-title" style="color:${color}">${title}</div>
+      <div class="level-overlay-detail">${oldDesc} → ${newDesc}</div>
+      <div class="level-overlay-sub">${isUp ? i18n.t('levelUpMsg') : i18n.t('levelDownMsg')}</div>
+      <button class="neon-btn neon-btn-cyan" style="width:100%" onclick="this.closest('.level-overlay').remove()">${isUp ? i18n.t('levelUpBtn') : i18n.t('levelDownBtn')}</button>
+    </div>`;
+    document.body.appendChild(overlay);
+    if (isUp) audio.play('levelUp');
+  }
+
+  _showPhase(id) {
     document.querySelectorAll('.game-phase').forEach(p => p.classList.remove('active-phase'));
-    const el = document.getElementById(phaseId);
-    if (el) el.classList.add('active-phase');
+    document.getElementById(id)?.classList.add('active-phase');
   }
 
   getResults() { return this.results; }
 }
-
 const game = new GameEngine();

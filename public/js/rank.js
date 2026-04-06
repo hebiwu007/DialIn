@@ -1,59 +1,74 @@
 /**
- * DialIn — Rank System
+ * DialIn — Level System (no ranks, just Level 1-5)
  */
 
-const RANKS = [
-  { tier: 'Bronze',   divisions: ['IV', 'III', 'II', 'I'], icon: '🥉', minRating: 0,    color: '#CD7F32' },
-  { tier: 'Silver',   divisions: ['IV', 'III', 'II', 'I'], icon: '🥈', minRating: 400,  color: '#C0C0C0' },
-  { tier: 'Gold',     divisions: ['IV', 'III', 'II', 'I'], icon: '🥇', minRating: 800,  color: '#FFD700' },
-  { tier: 'Platinum', divisions: ['IV', 'III', 'II', 'I'], icon: '💎', minRating: 1200, color: '#E5E4E2' },
-  { tier: 'Diamond',  divisions: ['IV', 'III', 'II', 'I'], icon: '💠', minRating: 1600, color: '#B9F2FF' },
-  { tier: 'Master',   divisions: ['I'],                    icon: '👑', minRating: 2000, color: '#FF6B00' },
+const LEVELS = [
+  { level: 1, colors: 2, showTime: 10, hasDistractors: false },
+  { level: 2, colors: 3, showTime: 8,  hasDistractors: false },
+  { level: 3, colors: 4, showTime: 5,  hasDistractors: false },
+  { level: 4, colors: 5, showTime: 3,  hasDistractors: false },
+  { level: 5, colors: 5, showTime: 2,  hasDistractors: true  },
 ];
 
-function getRank(rating) {
-  for (let i = RANKS.length - 1; i >= 0; i--) {
-    const rank = RANKS[i];
-    if (rating >= rank.minRating) {
-      const divIndex = Math.min(
-        Math.floor((rating - rank.minRating) / 100),
-        rank.divisions.length - 1
-      );
-      return {
-        tier: rank.tier,
-        division: rank.divisions[divIndex],
-        icon: rank.icon,
-        color: rank.color,
-        rating,
-        nextRating: i < RANKS.length - 1 ? RANKS[i + 1].minRating : rank.minRating + 100,
-        progress: ((rating - rank.minRating) % 100) / 100
-      };
-    }
-  }
-  return { tier: 'Bronze', division: 'IV', icon: '🥉', color: '#CD7F32', rating: 0, nextRating: 100, progress: 0 };
+function getLevelConfig(level) {
+  return LEVELS[Math.min(Math.max(level, 1), 5) - 1];
 }
 
-function calculateRatingChange(scorePercent, difficulty, isDaily, currentRating) {
-  const diffMult = { tutorial: 0.5, easy: 0.8, medium: 1.0, hard: 1.3, expert: 1.6 };
-  const mult = diffMult[difficulty] || 1.0;
-  const dailyBonus = isDaily ? 1.5 : 1.0;
-  const kFactor = currentRating > 1500 ? 0.7 : 1.0;
-  const baseChange = (scorePercent - 0.35) * 80;
-  return Math.max(-20, Math.min(40, Math.round(baseChange * mult * dailyBonus * kFactor)));
+function getLevelDescription(level) {
+  const cfg = getLevelConfig(level);
+  return `Level ${cfg.level} · ${cfg.colors} colors · ${cfg.showTime}s`;
+}
+
+function getLevelUpDescription(level) {
+  const cfg = getLevelConfig(level);
+  return `Level ${cfg.level} · ${cfg.colors} colors · ${cfg.showTime}s`;
 }
 
 function loadPlayerData() {
-  try {
-    return JSON.parse(localStorage.getItem('dialin_player') || '{}');
-  } catch { return {}; }
+  try { return JSON.parse(localStorage.getItem('dialin_player') || '{}'); } catch { return {}; }
 }
 
 function savePlayerData(data) {
   localStorage.setItem('dialin_player', JSON.stringify(data));
 }
 
-function getPlayerRating() {
-  return loadPlayerData().rating || 0;
+function getPlayerLevel() {
+  return loadPlayerData().level || 1;
+}
+
+function setPlayerLevel(level) {
+  const data = loadPlayerData();
+  const oldLevel = data.level || 1;
+  data.level = Math.min(Math.max(level, 1), 5);
+  savePlayerData(data);
+  return { oldLevel, newLevel: data.level, changed: oldLevel !== data.level };
+}
+
+function getLevelProgress() {
+  const data = loadPlayerData();
+  const history = data.gameHistory || [];
+  if (history.length === 0) return 0;
+  const recent = history.slice(-5);
+  const avg = recent.reduce((s, g) => s + g.scorePercent, 0) / recent.length;
+  return Math.min(avg / 0.75, 1); // 75% = level up
+}
+
+function checkLevelChange() {
+  const data = loadPlayerData();
+  const history = data.gameHistory || [];
+  if (history.length < 3) return null;
+  const recent = history.slice(-5);
+  const avg = recent.reduce((s, g) => s + g.scorePercent, 0) / recent.length;
+  const currentLevel = data.level || 1;
+
+  if (avg >= 0.75 && currentLevel < 5) {
+    const result = setPlayerLevel(currentLevel + 1);
+    if (result.changed) return { type: 'up', ...result };
+  } else if (avg < 0.35 && currentLevel > 1) {
+    const result = setPlayerLevel(currentLevel - 1);
+    if (result.changed) return { type: 'down', ...result };
+  }
+  return null;
 }
 
 function getPlayerStreak() {
@@ -65,14 +80,17 @@ function updateStreak() {
   const data = loadPlayerData();
   const today = new Date().toISOString().slice(0, 10);
   const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-  
   if (data.lastPlayDate === today) return data.streak || 0;
-  if (data.lastPlayDate === yesterday) {
-    data.streak = (data.streak || 0) + 1;
-  } else {
-    data.streak = 1;
-  }
+  data.streak = (data.lastPlayDate === yesterday) ? (data.streak || 0) + 1 : 1;
   data.lastPlayDate = today;
   savePlayerData(data);
   return data.streak;
+}
+
+function recordGame(scorePercent, difficulty) {
+  const data = loadPlayerData();
+  if (!data.gameHistory) data.gameHistory = [];
+  data.gameHistory.push({ scorePercent, difficulty, ts: Date.now() });
+  data.gameHistory = data.gameHistory.slice(-20);
+  savePlayerData(data);
 }

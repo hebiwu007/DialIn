@@ -1,113 +1,30 @@
-/* ===== Responsive ===== */
+/* ===== Responsive v3 ===== */
 
-/* Tablet */
 @media (max-width: 768px) {
-  .hero-title {
-    font-size: 36px;
-    letter-spacing: 8px;
-  }
-
-  .mode-grid {
-    grid-template-columns: 1fr;
-    max-width: 300px;
-    margin: 0 auto 24px;
-  }
-
-  .color-slots {
-    gap: 8px;
-  }
-
-  .color-slot {
-    width: 52px;
-    height: 52px;
-  }
+  .mode-grid { grid-template-columns: 1fr; max-width: 280px; margin: 0 auto 20px; }
+  .hero-title { font-size: 30px; letter-spacing: 6px; }
+  .hero-subtitle { font-size: 12px; }
+  .dial-knob { width: 60px; height: 60px; }
 }
 
-/* Mobile */
 @media (max-width: 480px) {
-  .page {
-    padding: 12px;
-  }
+  .page { padding: 12px; }
+  .scanlines::after { display: none; }
+  .hero { padding: 24px 0 16px; }
+  .hero-title { font-size: 24px; letter-spacing: 4px; }
+  .nav-bar { padding: 8px 12px; }
+  .nav-title { font-size: 12px; letter-spacing: 3px; }
 
-  /* Disable scanlines on mobile for performance */
-  .scanlines::after {
-    display: none;
-  }
+  .show-color { width: min(240px, 75vw); height: min(240px, 75vw); }
+  .guess-preview { width: min(260px, 88vw); height: 170px; }
+  .neon-slider { height: 20px; }
+  .neon-slider::-webkit-slider-thumb { width: 40px; height: 40px; }
+  .neon-slider::-moz-range-thumb { width: 40px; height: 40px; }
+  .compare-swatch { width: min(110px, 32vw); height: min(110px, 32vw); }
+  .compare-score { font-size: 36px; }
 
-  .hero-title {
-    font-size: 28px;
-    letter-spacing: 6px;
-  }
+  .summary-actions { flex-direction: column; }
+  .summary-actions .neon-btn { width: 100%; }
 
-  .hero-subtitle {
-    font-size: 13px;
-  }
-
-  .dial-knob {
-    width: 60px;
-    height: 60px;
-  }
-
-  .nav-bar {
-    padding: 10px 12px;
-  }
-
-  .nav-title {
-    font-size: 14px;
-    letter-spacing: 3px;
-  }
-
-  .color-slot {
-    width: 48px;
-    height: 48px;
-  }
-
-  .color-preview {
-    width: 120px;
-    height: 90px;
-  }
-
-  .slider-row {
-    gap: 8px;
-  }
-
-  .neon-slider {
-    height: 10px;
-  }
-
-  .neon-slider::-webkit-slider-thumb {
-    width: 32px;
-    height: 32px;
-  }
-
-  .neon-slider::-moz-range-thumb {
-    width: 32px;
-    height: 32px;
-  }
-
-  .dial-in-btn {
-    font-size: 15px;
-    padding: 14px 36px;
-  }
-
-  .results-total {
-    font-size: 28px;
-  }
-
-  .results-actions {
-    flex-direction: column;
-  }
-
-  .results-actions .neon-btn {
-    width: 100%;
-  }
-
-  .personality-stats {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .footer {
-    font-size: 10px;
-  }
+  .lang-switch { font-size: 9px; padding: 3px 8px; }
 }
