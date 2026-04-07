@@ -262,7 +262,12 @@ const DialIn = {
 
   _updateNickDisplay(name) {
     const el = document.getElementById('nav-nick-text');
-    if (el) el.textContent = name || 'Player';
+    if (!el) return;
+    if (name) {
+      el.textContent = name;
+    } else {
+      el.textContent = i18n.getLang() === 'zh' ? '点击设置昵称' : 'Tap to set name';
+    }
   },
 
   editNickname() {
