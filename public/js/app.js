@@ -10,6 +10,7 @@ const DialIn = {
     this._initMatrixRain();
     this._initNickname();
     this._initSoundToggle();
+    this._initTheme();
     updateNavStats();
 
     document.getElementById('btn-confirm').addEventListener('click', () => { audio.init(); game.submitGuess(); });
@@ -295,6 +296,32 @@ const DialIn = {
   _updateSoundBtn() {
     const btn = document.getElementById('nav-sound');
     if (btn) btn.textContent = audio.enabled ? '🔊' : '🔇';
+  },
+
+  // ===== THEME TOGGLE =====
+  _initTheme() {
+    const saved = localStorage.getItem('dialin_theme');
+    if (saved === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    this._updateThemeBtn();
+  },
+
+  toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'light' ? '' : 'light';
+    if (next) {
+      document.documentElement.setAttribute('data-theme', next);
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    localStorage.setItem('dialin_theme', next || 'dark');
+    this._updateThemeBtn();
+  },
+
+  _updateThemeBtn() {
+    const btn = document.getElementById('nav-theme');
+    if (!btn) return;
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    btn.textContent = isLight ? '☀️' : '🌙';
   },
 
   // ===== DUEL REFRESH =====

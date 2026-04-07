@@ -54,3 +54,48 @@
   --z-modal: 100;
   --z-scanlines: 9999;
 }
+
+/* ===== Light Theme ===== */
+:root[data-theme="light"] {
+  --bg-primary: #F0F2F5;
+  --bg-secondary: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-hover: #E8EBF0;
+  --border: #D0D5DD;
+  --border-light: #E0E4EA;
+
+  --neon-cyan: #0891B2;
+  --neon-cyan-dim: #0891B230;
+  --neon-cyan-glow: #0891B250;
+  --neon-pink: #E11D48;
+  --neon-pink-dim: #E11D4830;
+  --neon-pink-glow: #E11D4850;
+  --neon-purple: #7C3AED;
+  --neon-purple-dim: #7C3AED30;
+  --neon-purple-glow: #7C3AED50;
+  --neon-green: #059669;
+  --neon-green-dim: #05966930;
+  --neon-green-glow: #05966950;
+  --neon-yellow: #D97706;
+  --neon-yellow-dim: #D9770630;
+  --neon-yellow-glow: #D9770650;
+  --neon-orange: #EA580C;
+  --neon-orange-dim: #EA580C30;
+
+  --text-primary: #1A1A2E;
+  --text-secondary: #6B7294;
+  --text-muted: #9CA3AF;
+  --text-accent: #0891B2;
+}
+
+:root[data-theme="light"] body {
+  background: #F0F2F5;
+}
+
+:root[data-theme="light"] .scanlines::after {
+  display: none;
+}
+
+:root[data-theme="light"] #matrix-bg {
+  opacity: 0.06;
+}

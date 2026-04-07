@@ -35,6 +35,11 @@
   font-size: 12px; padding: 2px 6px; border-radius: 3px; transition: var(--transition-fast);
 }
 .nav-reset:hover { border-color: var(--neon-pink); }
+.nav-theme {
+  background: none; border: 1px solid var(--border); cursor: pointer;
+  font-size: 13px; padding: 2px 6px; border-radius: 3px; transition: var(--transition-fast);
+}
+.nav-theme:hover { border-color: var(--neon-yellow); }
 .page-back { margin-bottom: 12px; }
 .back-btn {
   background: none; border: 1px solid var(--border); color: var(--text-secondary);
