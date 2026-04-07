@@ -64,7 +64,7 @@ const DialIn = {
     const theme = getDailyTheme();
     const lang = i18n.getLang();
     document.getElementById('daily-date').textContent = date;
-    document.getElementById('daily-theme').textContent = lang === 'zh' ? theme.name : theme.nameEn;
+    document.getElementById('daily-theme').textContent = lang === 'zh' ? theme.desc : theme.descEn;
 
     const btn = document.getElementById('btn-daily-play');
     const resultDiv = document.getElementById('daily-result');
@@ -128,10 +128,9 @@ const DialIn = {
       document.querySelectorAll('.duel-section').forEach(s => s.classList.add('hidden'));
       document.getElementById('duel-created').classList.remove('hidden');
       document.getElementById('duel-created-score').innerHTML =
-        `<div style="font-size:24px;color:var(--neon-cyan);font-family:var(--font-display);">${results.totalScore} / ${results.maxScore}</div>
-         <div style="font-size:13px;color:var(--neon-green);letter-spacing:2px;margin-top:8px;">CHALLENGE CODE</div>
-         <div style="font-size:28px;color:var(--neon-yellow);letter-spacing:8px;font-family:var(--font-mono);">${data.id.toUpperCase()}</div>`;
+        `<div style="font-size:24px;color:var(--neon-cyan);font-family:var(--font-display);">${results.totalScore} / ${results.maxScore}</div>`;
       document.getElementById('duel-link-url').textContent = data.url;
+      document.getElementById('duel-code-display').textContent = data.id.toUpperCase();
     }
   },
 
@@ -300,6 +299,20 @@ const DialIn = {
     const data = await fetchDuel(this.currentDuelId);
     if (data && data.leaderboard) {
       this._renderDuelLeaderboard('duel-created-lb', data, nick);
+    }
+  },
+
+  // ===== RESET =====
+  resetAllData() {
+    const msg = i18n.getLang() === 'zh'
+      ? '确定要重置吗？等级、战绩、昵称都会清除，此操作不可恢复。'
+      : 'Reset all data? Level, history, nickname will be cleared. This cannot be undone.';
+    if (confirm(msg)) {
+      localStorage.removeItem('dialin_player');
+      localStorage.removeItem('dialin_nickname');
+      localStorage.removeItem('dialin_muted');
+      localStorage.removeItem('dialin_daily_nick');
+      location.reload();
     }
   },
 

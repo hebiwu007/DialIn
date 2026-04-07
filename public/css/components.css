@@ -37,6 +37,13 @@
   border-radius: 4px; transition: var(--transition-fast);
 }
 .back-btn:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); }
+.home-reset { text-align: center; margin-top: 12px; }
+.reset-btn {
+  background: none; border: 1px solid var(--border); color: var(--text-muted);
+  font-family: var(--font-body); font-size: 11px; padding: 6px 16px; cursor: pointer;
+  border-radius: 4px; transition: var(--transition-fast); opacity: 0.6;
+}
+.reset-btn:hover { border-color: var(--neon-pink); color: var(--neon-pink); opacity: 1; }
 .lang-switch {
   background: none; border: 1px solid var(--border); color: var(--text-secondary);
   font-family: var(--font-display); font-size: 10px; padding: 4px 10px; cursor: pointer;

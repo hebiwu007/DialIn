@@ -64,6 +64,9 @@
         <div class="level-next" id="home-level-next">Next: Level 2 · 3 colors · 8s</div>
         <div class="level-streak" id="home-streak"></div>
       </div>
+      <div class="home-reset">
+        <button class="reset-btn" onclick="DialIn.resetAllData()" data-i18n="btnReset">🔄 切换用户</button>
+      </div>
     </section>
 
     <!-- GAME -->
@@ -168,16 +171,24 @@
         <div id="duel-created" class="duel-section hidden">
           <h2 style="font-size:22px;letter-spacing:3px;color:var(--neon-green);margin-bottom:16px;" data-i18n="duelCreatedTitle">⚔ CHALLENGE CREATED!</h2>
           <div class="duel-score-display" id="duel-created-score"></div>
-          <div class="duel-link-box cyber-panel" style="width:100%;max-width:350px;margin:12px auto;text-align:center;">
-            <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;" data-i18n="duelShareLink">Share this link:</div>
+
+          <div class="duel-share-section cyber-panel" style="width:100%;max-width:350px;margin:12px auto;text-align:center;">
+            <div style="font-size:12px;color:var(--neon-purple);letter-spacing:1px;margin-bottom:6px;">📤 方式一：分享链接</div>
             <div class="mono" style="font-size:11px;color:var(--neon-cyan);word-break:break-all;padding:8px;background:var(--bg-secondary);border-radius:4px;" id="duel-link-url"></div>
             <button class="neon-btn neon-btn-cyan" style="width:100%;margin-top:8px;" id="btn-copy-link" onclick="DialIn.duelCopyLink()">
-              <span class="btn-text" data-i18n="duelCopyLink">📋 COPY LINK</span>
+              📋 复制链接
             </button>
           </div>
+
+          <div class="duel-code-section cyber-panel" style="width:100%;max-width:350px;margin:12px auto;text-align:center;">
+            <div style="font-size:12px;color:var(--neon-purple);letter-spacing:1px;margin-bottom:6px;">💬 方式二：告诉朋友挑战码</div>
+            <div id="duel-code-display" style="font-size:32px;color:var(--neon-yellow);letter-spacing:8px;font-family:var(--font-mono);margin:8px 0;"></div>
+            <div style="font-size:11px;color:var(--text-muted);">朋友在 Duel 页面输入这个码即可加入</div>
+          </div>
+
           <div id="duel-created-lb" style="width:100%;max-width:380px;margin-top:12px;"></div>
           <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
-            <button class="neon-btn neon-btn-cyan" onclick="DialIn.refreshDuelLeaderboard()" data-i18n="duelRefreshRank">🔄 刷新排名</button>
+            <button class="neon-btn neon-btn-cyan" onclick="DialIn.refreshDuelLeaderboard()">🔄 刷新排名</button>
             <button class="neon-btn" onclick="DialIn.navigate('/')" data-i18n="btnHome">🏠 HOME</button>
           </div>
         </div>

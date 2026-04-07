@@ -3,13 +3,13 @@
  */
 
 const DAILY_THEMES = [
-  { name: '🌿 自然色', nameEn: '🌿 Nature',   hueRanges: [[80, 160]], satRange: [30, 80], briRange: [30, 80] },
-  { name: '🌅 日落色', nameEn: '🌅 Sunset',    hueRanges: [[0, 40]],   satRange: [60, 100],briRange: [50, 90] },
-  { name: '🌊 海洋色', nameEn: '🌊 Ocean',    hueRanges: [[180, 240]],satRange: [40, 90], briRange: [40, 80] },
-  { name: '🍬 糖果色', nameEn: '🍬 Candy',     hueRanges: [[300, 360], [0, 60]], satRange: [50, 90], briRange: [60, 95] },
-  { name: '🏜️ 大地色', nameEn: '🏜️ Earth',    hueRanges: [[20, 50]],   satRange: [20, 60], briRange: [30, 70] },
-  { name: '💡 霓虹色', nameEn: '💡 Neon',      hueRanges: [[0, 360]],   satRange: [80, 100],briRange: [60, 100] },
-  { name: '🎲 无限制', nameEn: '🎲 Unlimited', hueRanges: [[0, 360]],   satRange: [10, 100], briRange: [10, 100] },
+  { name: '🌿 自然色', nameEn: '🌿 Nature',   desc: '今天的颜色来自大自然', descEn: "Today's colors come from nature", hueRanges: [[80, 160]], satRange: [30, 80], briRange: [30, 80] },
+  { name: '🌅 日落色', nameEn: '🌅 Sunset',    desc: '今天的颜色像日落', descEn: "Today's colors are like a sunset", hueRanges: [[0, 40]],   satRange: [60, 100],briRange: [50, 90] },
+  { name: '🌊 海洋色', nameEn: '🌊 Ocean',    desc: '今天的颜色来自深海', descEn: "Today's colors are from the deep sea", hueRanges: [[180, 240]],satRange: [40, 90], briRange: [40, 80] },
+  { name: '🍬 糖果色', nameEn: '🍬 Candy',     desc: '今天的颜色很甜', descEn: "Today's colors are sweet", hueRanges: [[300, 360], [0, 60]], satRange: [50, 90], briRange: [60, 95] },
+  { name: '🏜️ 大地色', nameEn: '🏜️ Earth',    desc: '今天的颜色很沉稳', descEn: "Today's colors are grounded", hueRanges: [[20, 50]],   satRange: [20, 60], briRange: [30, 70] },
+  { name: '💡 霓虹色', nameEn: '💡 Neon',      desc: '今天的颜色很鲜艳', descEn: "Today's colors are neon bright", hueRanges: [[0, 360]],   satRange: [80, 100],briRange: [60, 100] },
+  { name: '🌈 彩虹色', nameEn: '🌈 Rainbow',   desc: '今天不设限，什么颜色都可能出现', descEn: "Anything goes — expect any color today!", hueRanges: [[0, 360]],   satRange: [10, 100], briRange: [10, 100] },
 ];
 
 const API_BASE = '/api/daily';
