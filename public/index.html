@@ -26,7 +26,9 @@
     <nav class="nav-bar">
       <div class="nav-brand"><span class="nav-logo">◉</span><span class="nav-title">DIALIN</span></div>
       <div class="nav-right">
+        <button class="nav-nickname" id="nav-nickname" onclick="DialIn.editNickname()">👤 <span id="nav-nick-text">Player</span></button>
         <span class="nav-level" id="nav-level">Level 1</span>
+        <button class="nav-sound" id="nav-sound" onclick="DialIn.toggleSound()">🔊</button>
         <button class="nav-lang lang-switch">中文</button>
       </div>
     </nav>
@@ -120,6 +122,9 @@
 
     <!-- DAILY -->
     <section id="page-daily" class="page">
+      <div class="page-back">
+        <button class="back-btn" onclick="DialIn.navigate('/')">← <span data-i18n="btnHome">HOME</span></button>
+      </div>
       <div class="daily-header">
         <h2 data-i18n="dailyTitle">☀ DAILY DIAL</h2>
         <span class="daily-date mono" id="daily-date"></span>
@@ -132,6 +137,9 @@
 
     <!-- DUEL -->
     <section id="page-duel" class="page">
+      <div class="page-back">
+        <button class="back-btn" onclick="DialIn.navigate('/')">← <span data-i18n="btnHome">HOME</span></button>
+      </div>
       <div class="duel-container" id="duel-container">
         <!-- Duel home -->
         <div id="duel-home" class="duel-section">
@@ -167,6 +175,10 @@
             </button>
           </div>
           <div id="duel-created-lb" style="width:100%;max-width:380px;margin-top:12px;"></div>
+          <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+            <button class="neon-btn neon-btn-cyan" onclick="DialIn.refreshDuelLeaderboard()" data-i18n="duelRefreshRank">🔄 刷新排名</button>
+            <button class="neon-btn" onclick="DialIn.navigate('/')" data-i18n="btnHome">🏠 HOME</button>
+          </div>
         </div>
 
         <!-- Duel accept -->
@@ -174,6 +186,7 @@
           <h2 style="font-size:20px;letter-spacing:3px;color:var(--neon-pink);margin-bottom:12px;">⚔ <span id="duel-accept-creator"></span></h2>
           <div style="font-size:14px;color:var(--text-secondary);margin-bottom:6px;" data-i18n="duelInvitesYou">invites you to a color challenge!</div>
           <div id="duel-accept-lb" style="width:100%;max-width:350px;margin:12px auto;"></div>
+          <div style="font-size:12px;color:var(--text-secondary);text-align:center;margin-bottom:4px;" data-i18n="nicknameLabel">Your nickname:</div>
           <input type="text" id="duel-accept-nick" maxlength="20" placeholder="Your name"
             style="width:100%;max-width:300px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-primary);
             padding:12px;font-size:14px;text-align:center;border-radius:4px;font-family:var(--font-body);margin:8px auto;">

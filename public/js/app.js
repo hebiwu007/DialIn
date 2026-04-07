@@ -8,6 +8,8 @@ const DialIn = {
   init() {
     i18n.init();
     this._initMatrixRain();
+    this._initNickname();
+    this._initSoundToggle();
     updateNavStats();
 
     document.getElementById('btn-confirm').addEventListener('click', () => { audio.init(); game.submitGuess(); });
@@ -112,7 +114,7 @@ const DialIn = {
   },
 
   async duelCreateFinish(results) {
-    const nick = getDailyNickname() || 'Player';
+    const nick = this.getNickname() || 'Player';
     const data = await createDuel(
       nick,
       this.duelColors || game.colors,
@@ -172,18 +174,22 @@ const DialIn = {
 
     // Store colors for game
     this.duelColors = data.colors;
+
+    // Pre-fill nickname
+    const savedNick = this.getNickname();
+    if (savedNick) document.getElementById('duel-accept-nick').value = savedNick;
   },
 
   async duelAccept() {
     const nick = document.getElementById('duel-accept-nick').value.trim();
     if (!nick) return;
-    setDailyNickname(nick);
+    this.setNickname(nick);
     this._showPage('game');
     game._startDuel(this.duelColors);
   },
 
   async duelJoinFinish(results) {
-    const nick = getDailyNickname() || 'Player';
+    const nick = this.getNickname() || 'Player';
     const data = await joinDuel(
       this.currentDuelId,
       nick,
@@ -235,6 +241,64 @@ const DialIn = {
     t.className = 'toast'; t.textContent = msg;
     document.body.appendChild(t);
     setTimeout(() => { t.style.animation = 'fadeOut 0.3s ease-out forwards'; setTimeout(() => t.remove(), 300); }, 2000);
+  },
+
+  // ===== NICKNAME =====
+  _initNickname() {
+    const nick = this.getNickname();
+    this._updateNickDisplay(nick);
+  },
+
+  getNickname() {
+    return localStorage.getItem('dialin_nickname') || localStorage.getItem('dialin_daily_nick') || '';
+  },
+
+  setNickname(name) {
+    localStorage.setItem('dialin_nickname', name);
+    if (typeof setDailyNickname === 'function') setDailyNickname(name);
+    this._updateNickDisplay(name);
+  },
+
+  _updateNickDisplay(name) {
+    const el = document.getElementById('nav-nick-text');
+    if (el) el.textContent = name || 'Player';
+  },
+
+  editNickname() {
+    const current = this.getNickname();
+    const name = prompt(i18n.getLang() === 'zh' ? '输入你的昵称：' : 'Enter your nickname:', current || '');
+    if (name !== null && name.trim()) {
+      this.setNickname(name.trim());
+      this.showToast((i18n.getLang() === 'zh' ? '昵称已更新: ' : 'Nickname: ') + name.trim());
+    }
+  },
+
+  // ===== SOUND TOGGLE =====
+  _initSoundToggle() {
+    const muted = localStorage.getItem('dialin_muted') === 'true';
+    if (muted) audio.enabled = false;
+    this._updateSoundBtn();
+  },
+
+  toggleSound() {
+    const enabled = audio.toggle();
+    localStorage.setItem('dialin_muted', enabled ? '' : 'true');
+    this._updateSoundBtn();
+  },
+
+  _updateSoundBtn() {
+    const btn = document.getElementById('nav-sound');
+    if (btn) btn.textContent = audio.enabled ? '🔊' : '🔇';
+  },
+
+  // ===== DUEL REFRESH =====
+  async refreshDuelLeaderboard() {
+    if (!this.currentDuelId) return;
+    const nick = this.getNickname();
+    const data = await fetchDuel(this.currentDuelId);
+    if (data && data.leaderboard) {
+      this._renderDuelLeaderboard('duel-created-lb', data, nick);
+    }
   },
 
   _initMatrixRain() {
