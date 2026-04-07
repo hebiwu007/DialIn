@@ -72,19 +72,19 @@ function _shareCopyText(text) {
 
 async function shareResult(result) {
   const text = generateWordleText(result);
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 
   // Mobile: try Web Share API first (native share sheet)
-  if (navigator.share) {
+  if (isMobile && navigator.share) {
     try {
       await navigator.share({ title: 'DialIn', text });
       return;
     } catch (e) {
-      // User cancelled or failed — fall through to copy
       if (e.name === 'AbortError') return;
     }
   }
 
-  // Fallback: copy text to clipboard (reliable on both desktop & mobile)
+  // Desktop & fallback: copy text to clipboard
   const ok = _shareCopyText(text);
   const isZh = i18n.getLang() === 'zh';
   DialIn.showToast(ok
