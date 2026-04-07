@@ -9,15 +9,47 @@ function generateWordleText(result) {
     if (r.score >= 2) return '🟧';
     return '🟥';
   }).join('');
-  
-  const lines = [
+
+  const isZh = i18n.getLang() === 'zh';
+  const nick = DialIn.getNickname() || (isZh ? '有人' : 'Someone');
+  const score = `${result.totalScore.toFixed(1)}/${result.maxScore}`;
+  const personality = result.personality?.name || '';
+  const mode = result.mode || 'free';
+
+  if (mode === 'daily') {
+    const date = new Date().toISOString().slice(0, 10);
+    const topPct = result.percentile ? ` · ${isZh ? '前' : 'Top '}${Math.round(100 - result.percentile)}%` : '';
+    const lines = isZh ? [
+      `☀ DialIn 每日挑战 — ${date}`,
+      `${blocks}  ${score}`,
+      personality ? `${personality}${topPct}` : '',
+      `来挑战今天的颜色吧! 👇`,
+      `https://dialin.cc`
+    ] : [
+      `☀ DialIn Daily — ${date}`,
+      `${blocks}  ${score}`,
+      personality ? `${personality}${topPct}` : '',
+      `Challenge today's colors! 👇`,
+      `https://dialin.cc`
+    ];
+    return lines.filter(Boolean).join('\n');
+  }
+
+  // Free play
+  const lines = isZh ? [
+    `🎨 DialIn — 色彩记忆游戏`,
+    `${blocks}  ${score}`,
+    personality ? personality : '',
+    `${nick} 在玩这个游戏，来一起挑战! 👇`,
+    `https://dialin.cc`
+  ] : [
     `🎨 DialIn — Color Memory Game`,
-    `${blocks}  ${result.totalScore.toFixed(1)}/${result.maxScore}`,
-    `${result.personality?.name || ''}`,
-    `Come play with me! 👇`,
+    `${blocks}  ${score}`,
+    personality ? personality : '',
+    `${nick} is playing! Come join the challenge 👇`,
     `https://dialin.cc`
   ];
-  return lines.join('\n');
+  return lines.filter(Boolean).join('\n');
 }
 
 function generateShareCard(result) {

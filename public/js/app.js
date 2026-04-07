@@ -12,6 +12,14 @@ const DialIn = {
     this._initSoundToggle();
     this._initTheme();
     updateNavStats();
+    // Close nav menu on outside click
+    document.addEventListener('click', (e) => {
+      const dd = document.getElementById('nav-dropdown');
+      const btn = document.getElementById('nav-more-btn');
+      if (dd && dd.classList.contains('open') && !dd.contains(e.target) && e.target !== btn) {
+        dd.classList.remove('open');
+      }
+    });
 
     document.getElementById('btn-confirm').addEventListener('click', () => { audio.init(); game.submitGuess(); });
     document.getElementById('btn-next').addEventListener('click', () => { audio.init(); game.nextRound(); });
@@ -137,19 +145,25 @@ const DialIn = {
 
   duelCopyLink() {
     const url = document.getElementById('duel-link-url').textContent;
-    const nick = this.getNickname() || 'Someone';
-    const text = `🎨 DialIn — Color Duel!\n${nick} challenges you to a color memory duel!\nCan you beat their score? 🎯\n${url}`;
+    const nick = this.getNickname() || (i18n.getLang() === 'zh' ? '有人' : 'Someone');
+    const isZh = i18n.getLang() === 'zh';
+    const text = isZh
+      ? `⚔ DialIn 色彩对决!\n${nick} 向你发起色彩记忆挑战!\n你能击败对手吗? 🎯\n${url}`
+      : `⚔ DialIn Color Duel!\n${nick} challenges you to a color memory duel!\nCan you beat their score? 🎯\n${url}`;
     copyToClipboard(text);
-    this.showToast('📋 Copied! Share with friends!');
+    this.showToast(isZh ? '📋 已复制! 分享给朋友吧!' : '📋 Copied! Share with friends!');
   },
 
   copyDuelCode() {
     const code = document.getElementById('duel-code-display')?.textContent || '';
     if (!code) return;
-    const nick = this.getNickname() || 'Someone';
-    const text = `🎨 DialIn — Color Duel!\n${nick} challenges you! Enter code: ${code}\nat https://dialin.cc`;
-    copyToClipboard(code);
-    this.showToast('📋 Code copied!');
+    const nick = this.getNickname() || (i18n.getLang() === 'zh' ? '有人' : 'Someone');
+    const isZh = i18n.getLang() === 'zh';
+    const text = isZh
+      ? `⚔ DialIn 色彩对决!\n${nick} 向你发起挑战! 输入码: ${code}\n来玩 👉 https://dialin.cc`
+      : `⚔ DialIn Color Duel!\n${nick} challenges you! Enter code: ${code}\nPlay now 👉 https://dialin.cc`;
+    copyToClipboard(text);
+    this.showToast(isZh ? '📋 Code 已复制!' : '📋 Code copied!');
   },
 
   async duelJoin() {
@@ -278,7 +292,7 @@ const DialIn = {
     if (name) {
       el.textContent = name;
     } else {
-      el.textContent = i18n.getLang() === 'zh' ? '点击设置昵称' : 'Tap to set name';
+      el.textContent = i18n.getLang() === 'zh' ? '设置昵称' : 'Set Name';
     }
   },
 
@@ -333,6 +347,25 @@ const DialIn = {
     if (!btn) return;
     const isLight = document.documentElement.getAttribute('data-theme') === 'light';
     btn.textContent = isLight ? '☀️' : '🌙';
+    const dd = document.getElementById('dd-theme');
+    if (dd) dd.textContent = isLight ? '☀️' : '🌙';
+  },
+
+  // ===== NAV MENU (mobile) =====
+  toggleNavMenu() {
+    const dd = document.getElementById('nav-dropdown');
+    if (!dd) return;
+    dd.classList.toggle('open');
+    // Sync icons
+    const soundIcon = audio.enabled ? '🔊' : '🔇';
+    const ddSound = document.getElementById('dd-sound');
+    if (ddSound) ddSound.textContent = soundIcon;
+    this._updateThemeBtn();
+  },
+
+  closeNavMenu() {
+    const dd = document.getElementById('nav-dropdown');
+    if (dd) dd.classList.remove('open');
   },
 
   // ===== DUEL REFRESH =====

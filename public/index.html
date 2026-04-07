@@ -62,10 +62,17 @@
       <div class="nav-right">
         <button class="nav-nickname" id="nav-nickname" onclick="DialIn.editNickname()">👤 <span id="nav-nick-text">Player</span></button>
         <span class="nav-level" id="nav-level">Level 1</span>
-        <button class="nav-sound" id="nav-sound" onclick="DialIn.toggleSound()">🔊</button>
-        <button class="nav-theme" id="nav-theme" onclick="DialIn.toggleTheme()">🌙</button>
-        <button class="nav-reset" onclick="DialIn.resetAllData()" title="Reset">🔄</button>
-        <button class="nav-lang lang-switch">中文</button>
+        <button class="nav-sound nav-menu-item" id="nav-sound" onclick="DialIn.toggleSound()">🔊</button>
+        <button class="nav-theme nav-menu-item" id="nav-theme" onclick="DialIn.toggleTheme()">🌙</button>
+        <button class="nav-reset nav-menu-item" onclick="DialIn.resetAllData()" title="Reset">🔄</button>
+        <button class="nav-lang lang-switch nav-menu-item">中文</button>
+        <button class="nav-more-btn" id="nav-more-btn" onclick="DialIn.toggleNavMenu()">⋯</button>
+      </div>
+      <div class="nav-dropdown" id="nav-dropdown">
+        <button onclick="DialIn.toggleSound()"><span id="dd-sound">🔊</span> <span data-i18n="navSound">Sound</span></button>
+        <button onclick="DialIn.toggleTheme()"><span id="dd-theme">🌙</span> <span data-i18n="navTheme">Theme</span></button>
+        <button onclick="DialIn.toggleNavMenu(); i18n.toggle(); updateNavStats();">🌐 <span data-i18n="langSwitch">中文</span></button>
+        <button onclick="DialIn.resetAllData()">🔄 <span data-i18n="navReset">Reset</span></button>
       </div>
     </nav>
 
@@ -252,15 +259,17 @@
     </section>
 
     <footer class="footer">
-      <div class="footer-links">
-        <a href="/privacy.html" style="color:var(--text-muted);text-decoration:none;" data-i18n="footerPrivacy">Privacy</a>
-        <a href="/about.html" style="color:var(--text-muted);text-decoration:none;" data-i18n="footerAbout">About</a>
+      <div class="footer-top">
+        <span class="footer-brand">DIALIN.CC v3.1</span>
+        <div class="footer-links">
+          <a href="/privacy.html" data-i18n="footerPrivacy">Privacy</a>
+          <a href="/about.html" data-i18n="footerAbout">About</a>
+        </div>
       </div>
-      <span>DIALIN.CC</span><span>v3.1</span>
-      <div class="footer-contact">
-        <span>微信: hebiwu007</span>
-        <span>📧 hebiwu007@gmail.com</span>
-        <a href="https://x.com/billy_He007" target="_blank" style="color:var(--text-muted);text-decoration:none;">X: @billy_He007</a>
+      <div class="footer-bottom">
+        <span data-i18n="footerWechat">微信: hebiwu007</span>
+        <span>·</span>
+        <a href="https://x.com/billy_He007" target="_blank">X: @billy_He007</a>
       </div>
     </footer>
   </div>
