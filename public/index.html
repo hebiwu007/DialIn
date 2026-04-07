@@ -29,6 +29,7 @@
         <button class="nav-nickname" id="nav-nickname" onclick="DialIn.editNickname()">👤 <span id="nav-nick-text">Player</span></button>
         <span class="nav-level" id="nav-level">Level 1</span>
         <button class="nav-sound" id="nav-sound" onclick="DialIn.toggleSound()">🔊</button>
+        <button class="nav-reset" onclick="DialIn.resetAllData()" title="Reset">🔄</button>
         <button class="nav-lang lang-switch">中文</button>
       </div>
     </nav>
@@ -63,9 +64,6 @@
         <div class="level-bar"><div class="level-bar-fill" id="home-level-bar"></div></div>
         <div class="level-next" id="home-level-next">Next: Level 2 · 3 colors · 8s</div>
         <div class="level-streak" id="home-streak"></div>
-      </div>
-      <div class="home-reset">
-        <button class="reset-btn" onclick="DialIn.resetAllData()" data-i18n="btnReset">🔄 切换用户</button>
       </div>
     </section>
 
@@ -117,7 +115,7 @@
         <div class="summary-wrap" id="summary-wrap"></div>
         <div class="summary-actions">
           <button class="neon-btn neon-btn-cyan" onclick="DialIn.shareResult()" data-i18n="btnShare">📤 SHARE</button>
-          <button class="neon-btn neon-btn-purple" onclick="DialIn.playAgain()" data-i18n="btnChallenge">⚔ 继续挑战</button>
+          <button class="neon-btn neon-btn-purple" onclick="DialIn.playAgain()" data-i18n="btnChallenge">⚔ CONTINUE</button>
           <button class="neon-btn" onclick="DialIn.navigate('/')" data-i18n="btnHome">🏠 HOME</button>
         </div>
       </div>
