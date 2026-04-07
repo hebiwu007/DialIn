@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dialin.cc/sitemap.xml
+
+# DialIn - Color Memory Game
