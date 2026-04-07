@@ -159,7 +159,7 @@
                 <span class="btn-text" data-i18n="duelJoin">JOIN</span>
               </button>
             </div>
-            <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:4px;" data-i18n="duelCodeHint">💡 Ask your friend for the 6-char code or click their link</div>
+            <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:4px;" data-i18n="duelCodeHint">💡 Ask your friend for the code or click their link</div>
           </div>
         </div>
 
@@ -171,17 +171,15 @@
           <div class="duel-score-display" id="duel-created-score"></div>
 
           <div class="duel-share-section cyber-panel" style="width:100%;max-width:350px;margin:12px auto;text-align:center;">
-            <div style="font-size:12px;color:var(--neon-purple);letter-spacing:1px;margin-bottom:6px;">📤 方式一：分享链接</div>
+            <div style="font-size:12px;color:var(--neon-purple);letter-spacing:1px;margin-bottom:6px;" data-i18n="duelMethod1">📤 Share link</div>
             <div class="mono" style="font-size:11px;color:var(--neon-cyan);word-break:break-all;padding:8px;background:var(--bg-secondary);border-radius:4px;" id="duel-link-url"></div>
-            <button class="neon-btn neon-btn-cyan" style="width:100%;margin-top:8px;" id="btn-copy-link" onclick="DialIn.duelCopyLink()">
-              📋 复制链接
-            </button>
+            <button class="neon-btn neon-btn-cyan" style="width:100%;margin-top:8px;" id="btn-copy-link" onclick="DialIn.duelCopyLink()" data-i18n="duelCopyLink">📋 COPY LINK</button>
           </div>
 
           <div class="duel-code-section cyber-panel" style="width:100%;max-width:350px;margin:12px auto;text-align:center;">
-            <div style="font-size:12px;color:var(--neon-purple);letter-spacing:1px;margin-bottom:6px;">💬 方式二：告诉朋友挑战码</div>
+            <div style="font-size:12px;color:var(--neon-purple);letter-spacing:1px;margin-bottom:6px;" data-i18n="duelMethod2">💬 Share challenge code</div>
             <div id="duel-code-display" style="font-size:32px;color:var(--neon-yellow);letter-spacing:8px;font-family:var(--font-mono);margin:8px 0;"></div>
-            <div style="font-size:11px;color:var(--text-muted);">朋友在 Duel 页面输入这个码即可加入</div>
+            <div style="font-size:11px;color:var(--text-muted);" data-i18n="duelCodeHint2">Friends can enter this code on the Duel page to join</div>
           </div>
 
           <div id="duel-created-lb" style="width:100%;max-width:380px;margin-top:12px;"></div>
