@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DialIn — About</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg: #0a0a0f; --bg2: #12121a; --text: #e0e0e8; --text2: #8888a0; --cyan: #00f0ff; --purple: #a855f7; --pink: #ff0066; --green: #00ff88; --border: #1e1e2e; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: 'Exo 2', sans-serif; line-height: 1.7; padding: 20px; }
+    .container { max-width: 700px; margin: 0 auto; }
+    h1 { font-family: 'Orbitron', sans-serif; color: var(--cyan); font-size: 28px; margin: 20px 0 20px; letter-spacing: 4px; text-shadow: 0 0 10px rgba(0,240,255,0.3); }
+    h2 { font-family: 'Orbitron', sans-serif; color: var(--purple); font-size: 16px; margin: 24px 0 10px; letter-spacing: 2px; }
+    p, li { color: var(--text); margin-bottom: 10px; font-size: 14px; }
+    ul { padding-left: 20px; margin-bottom: 10px; }
+    a { color: var(--cyan); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .back { display: inline-block; margin-bottom: 20px; color: var(--text2); font-size: 13px; border: 1px solid var(--border); padding: 6px 14px; border-radius: 4px; text-decoration: none; }
+    .back:hover { border-color: var(--cyan); color: var(--cyan); }
+    .tagline { color: var(--text2); font-size: 16px; margin-bottom: 30px; }
+    .feature { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+    .feature-title { font-family: 'Orbitron', sans-serif; font-size: 13px; letter-spacing: 2px; margin-bottom: 6px; }
+    .feature-title.cyan { color: var(--cyan); }
+    .feature-title.purple { color: var(--purple); }
+    .feature-title.pink { color: var(--pink); }
+    .feature-title.green { color: var(--green); }
+    .tech { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .tech span { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); font-size: 11px; padding: 4px 10px; border-radius: 3px; font-family: 'Exo 2', sans-serif; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="/">← Back to DialIn</a>
+    <h1>DIALIN</h1>
+    <p class="tagline">Dial In Your Colors — A cyberpunk color memory game</p>
+
+    <h2>WHAT IS DIALIN?</h2>
+    <p>Humans can't reliably recall colors. DialIn is a simple but addictive game that tests your color memory. We show you colors, you try to recreate them, and we measure how close you get using professional color science (CIEDE2000).</p>
+
+    <div class="feature">
+      <div class="feature-title cyan">▶ FREE DIAL</div>
+      <p>Solo practice with 5 levels of difficulty. Start with 2 colors at 10 seconds, work your way up to 5 colors at 2 seconds — with distracting decoy colors at Level 5!</p>
+    </div>
+
+    <div class="feature">
+      <div class="feature-title purple">☀ DAILY CHALLENGE</div>
+      <p>The same 5 colors for everyone on Earth, once per day. Compete on the global leaderboard with a new color theme every day of the week.</p>
+    </div>
+
+    <div class="feature">
+      <div class="feature-title pink">⚔ DUEL</div>
+      <p>Challenge your friends! Play 5 colors, share your link or challenge code, and see who has the better color memory. Up to 24 hours to accept.</p>
+    </div>
+
+    <div class="feature">
+      <div class="feature-title green">🎨 COLOR PERSONALITY</div>
+      <p>Over time, DialIn analyzes your color memory biases. Are you a Flame Artist? Moonlight Painter? Or do you have the Precise Eye? Discover your unique color personality.</p>
+    </div>
+
+    <h2>HOW SCORING WORKS</h2>
+    <p>Each color is scored 0–10 based on CIEDE2000 color difference — the same metric used in professional color science. A score of 10 means near-perfect memory. We use an S-curve to make the scoring feel fair and rewarding.</p>
+
+    <h2>BUILT WITH</h2>
+    <div class="tech">
+      <span>HTML5</span>
+      <span>CSS3</span>
+      <span>JavaScript</span>
+      <span>Cloudflare Pages</span>
+      <span>Cloudflare Workers</span>
+      <span>Cloudflare D1</span>
+      <span>CIEDE2000</span>
+      <span>Web Audio API</span>
+    </div>
+
+    <h2>VERSION</h2>
+    <p>DialIn v3.1 — April 2026</p>
+
+    <p style="margin-top:30px;"><a class="back" href="/">← Back to DialIn</a></p>
+  </div>
+</body>
+</html>
