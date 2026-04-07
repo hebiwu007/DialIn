@@ -26,7 +26,7 @@ function collectBiasData(original, guess) {
 
 function analyzeColorBias(biasHistory) {
   if (biasHistory.length < 3) {
-    return { status: 'insufficient', personality: { name: '🎨 探索中的调色师', desc: '继续玩来解锁你的色彩人格...' }};
+    return { status: 'insufficient', personality: { name: i18n.t('personalityExplorer.name'), desc: i18n.t('personalityExplorer.desc') }};
   }
 
   const n = biasHistory.length;
@@ -35,7 +35,7 @@ function analyzeColorBias(biasHistory) {
   const avgChromaErr = biasHistory.reduce((s, d) => s + d.chromaError, 0) / n;
 
   const personality = generatePersonality(avgSatErr, avgBriErr, avgChromaErr);
-  
+
   return {
     status: 'ok',
     avgSatError: Math.round(avgSatErr * 10) / 10,
@@ -46,13 +46,17 @@ function analyzeColorBias(biasHistory) {
 
 function generatePersonality(satErr, briErr, chromaErr) {
   const types = [
-    { name: '🔥 烈焰调色师', desc: '你眼中的世界比实际更鲜艳明亮！', condition: satErr > 10 && briErr > 5 },
-    { name: '🌫️ 迷雾诗人', desc: '你倾向于记住更柔和、朦胧的色调。', condition: satErr < -10 && briErr < -5 },
-    { name: '💎 霓虹猎手', desc: '你喜欢浓烈但不明亮的颜色——深沉的宝石色调。', condition: satErr > 10 && briErr < -5 },
-    { name: '🌙 月光画师', desc: '你记住的颜色总是偏亮偏淡，像月光下的世界。', condition: satErr < -5 && briErr > 10 },
-    { name: '🎯 精准之眼', desc: '极其准确的色彩记忆，可能是天生的设计师！', condition: Math.abs(satErr) < 5 && Math.abs(briErr) < 5 },
-    { name: '🎨 浪漫印象派', desc: '你对颜色的彩度感知独特，像印象派画家一样主观。', condition: Math.abs(chromaErr) > 8 }
+    { key: 'personalityFlame', condition: satErr > 10 && briErr > 5 },
+    { key: 'personalityMist', condition: satErr < -10 && briErr < -5 },
+    { key: 'personalityNeon', condition: satErr > 10 && briErr < -5 },
+    { key: 'personalityMoon', condition: satErr < -5 && briErr > 10 },
+    { key: 'personalityPrecise', condition: Math.abs(satErr) < 5 && Math.abs(briErr) < 5 },
+    { key: 'personalityImpressionist', condition: Math.abs(chromaErr) > 8 }
   ];
 
-  return types.find(t => t.condition) || { name: '🎨 探索中的调色师', desc: '你的色彩人格正在形成中...' };
+  const match = types.find(t => t.condition);
+  if (match) {
+    return { name: i18n.t(match.key + '.name'), desc: i18n.t(match.key + '.desc') };
+  }
+  return { name: i18n.t('personalityExplorer.name'), desc: i18n.t('personalityExplorer.desc') };
 }

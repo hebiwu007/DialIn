@@ -117,6 +117,7 @@ const i18n = {
     return val;
   },
   getLang() { return this.currentLang; },
+  getLang() { return this.currentLang; },
   apply() {
     const lang = this.currentLang;
     document.querySelectorAll('.lang-switch').forEach(e => e.textContent = LANG[lang].langSwitch);
