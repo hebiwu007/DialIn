@@ -17,7 +17,7 @@
 .nav-brand { display: flex; align-items: center; gap: 8px; }
 .nav-logo { font-size: 20px; color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
 .nav-title { font-family: var(--font-display); font-size: 14px; letter-spacing: 4px; }
-.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-right { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
 .nav-level { font-family: var(--font-mono); font-size: 12px; color: var(--neon-yellow); }
 .nav-nickname {
   background: none; border: 1px solid var(--border); color: var(--neon-cyan);
@@ -50,7 +50,7 @@
 .lang-switch {
   background: none; border: 1px solid var(--border); color: var(--text-secondary);
   font-family: var(--font-display); font-size: 10px; padding: 4px 10px; cursor: pointer;
-  transition: var(--transition-fast); position: fixed; top: 10px; right: 12px; z-index: 10001;
+  transition: var(--transition-fast);
 }
 .lang-switch:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); }
 
@@ -245,7 +245,9 @@
 .duel-link-box { text-align: center; }
 
 /* FOOTER */
-.footer { display: flex; justify-content: space-between; padding: 10px 20px; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+.footer { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 20px; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+.footer-links { display: flex; gap: 16px; }
+.footer-contact { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 
 /* TOAST */
 .toast {

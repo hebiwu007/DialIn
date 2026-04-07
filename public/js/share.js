@@ -10,7 +10,14 @@ function generateWordleText(result) {
     return '🟥';
   }).join('');
   
-  return `🎨 DialIn — ${result.mode}\n${blocks}  ${result.totalScore.toFixed(1)}/${result.maxScore}\n${result.personality?.name || ''}\n🔗 Play: https://dialin.cc`;
+  const lines = [
+    `🎨 DialIn — Color Memory Game`,
+    `${blocks}  ${result.totalScore.toFixed(1)}/${result.maxScore}`,
+    `${result.personality?.name || ''}`,
+    `Come play with me! 👇`,
+    `https://dialin.cc`
+  ];
+  return lines.join('\n');
 }
 
 function generateShareCard(result) {
@@ -117,28 +124,28 @@ function roundRect(ctx, x, y, w, h, r) {
 
 async function shareResult(result) {
   const text = generateWordleText(result);
-  const dataUrl = generateShareCard(result);
 
-  // Mobile: try Web Share API with image
+  // Mobile: try Web Share API
   if (navigator.share) {
-    try {
-      const blob = await (await fetch(dataUrl)).blob();
-      const file = new File([blob], 'dialin-score.png', { type: 'image/png' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ title: 'DialIn', text: 'Play color memory game!', files: [file] });
-        return;
-      }
-    } catch (e) { /* fallback */ }
-
-    // Text-only share
     try {
       await navigator.share({ title: 'DialIn', text });
       return;
     } catch (e) { /* cancelled */ }
+    return;
   }
 
-  // Desktop: show share modal
-  _showShareModal(text, dataUrl);
+  // Desktop: copy to clipboard
+  try {
+    await navigator.clipboard.writeText(text);
+    DialIn.showToast('📋 Copied! Share it with your friends!');
+  } catch (e) {
+    // Last resort: download image
+    const dataUrl = generateShareCard(result);
+    const link = document.createElement('a');
+    link.download = `dialin-${Date.now()}.png`;
+    link.href = dataUrl;
+    link.click();
+  }
 }
 
 function _showShareModal(text, dataUrl) {

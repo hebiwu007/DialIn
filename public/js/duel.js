@@ -61,12 +61,20 @@ async function fetchDuel(duelId) {
 }
 
 function copyToClipboard(text) {
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text);
-  } else {
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta);
-    ta.select(); document.execCommand('copy');
-    ta.remove();
+  // Use textarea fallback — most reliable across mobile browsers
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0;';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+  } catch (e) {
+    // Try clipboard API as fallback
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+    }
   }
+  ta.remove();
 }

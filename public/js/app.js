@@ -137,13 +137,17 @@ const DialIn = {
 
   duelCopyLink() {
     const url = document.getElementById('duel-link-url').textContent;
-    copyToClipboard(url);
-    this.showToast(i18n.t('duelCopied'));
+    const nick = this.getNickname() || 'Someone';
+    const text = `🎨 DialIn — Color Duel!\n${nick} challenges you to a color memory duel!\nCan you beat their score? 🎯\n${url}`;
+    copyToClipboard(text);
+    this.showToast('📋 Copied! Share with friends!');
   },
 
   copyDuelCode() {
     const code = document.getElementById('duel-code-display')?.textContent || '';
     if (!code) return;
+    const nick = this.getNickname() || 'Someone';
+    const text = `🎨 DialIn — Color Duel!\n${nick} challenges you! Enter code: ${code}\nat https://dialin.cc`;
     copyToClipboard(code);
     this.showToast('📋 Code copied!');
   },
