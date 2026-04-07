@@ -141,6 +141,13 @@ const DialIn = {
     this.showToast(i18n.t('duelCopied'));
   },
 
+  copyDuelCode() {
+    const code = document.getElementById('duel-code-display')?.textContent || '';
+    if (!code) return;
+    copyToClipboard(code);
+    this.showToast('📋 Code copied!');
+  },
+
   async duelJoin() {
     const code = document.getElementById('duel-join-code').value.trim().toUpperCase();
     if (!code || code.length < 4) { this.showToast(i18n.t('duelInvalidCode')); return; }

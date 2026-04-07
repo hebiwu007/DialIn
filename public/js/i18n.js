@@ -36,6 +36,7 @@ const LANG = {
     duelMethod1: '📤 Option 1: Share link',
     duelMethod2: '💬 Option 2: Tell your friend the code',
     duelCodeHint2: 'Your friend can enter this code on the Duel page to join',
+    duelCopyCode: '📋 Copy Code',
     duelInvitesYou: 'invites you to a color challenge!',
     duelAccept: '▶ ACCEPT CHALLENGE',
     duelResultTitle: '⚔ BATTLE RESULT',
