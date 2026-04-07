@@ -151,13 +151,14 @@
               <span class="btn-sub" data-i18n="duelCreateSub">Play & share link</span>
             </button>
             <div style="display:flex;gap:8px;width:100%;max-width:300px;">
-              <input type="text" id="duel-join-code" placeholder="CODE" maxlength="6"
+              <input type="text" id="duel-join-code" placeholder="Enter 6-char code" maxlength="6"
                 style="flex:1;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-primary);
                 padding:12px;font-size:16px;font-family:var(--font-mono);letter-spacing:4px;text-align:center;border-radius:4px;text-transform:uppercase;">
               <button class="neon-btn neon-btn-cyan" style="flex:1;" onclick="DialIn.duelJoin()">
                 <span class="btn-text" data-i18n="duelJoin">JOIN</span>
               </button>
             </div>
+            <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:4px;" data-i18n="duelCodeHint">💡 Ask your friend for the 6-char code or click their link</div>
           </div>
         </div>
 

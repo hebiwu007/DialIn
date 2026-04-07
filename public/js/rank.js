@@ -92,5 +92,9 @@ function recordGame(scorePercent, difficulty) {
   if (!data.gameHistory) data.gameHistory = [];
   data.gameHistory.push({ scorePercent, difficulty, ts: Date.now() });
   data.gameHistory = data.gameHistory.slice(-20);
+  // Save bias history for cross-game personality analysis
+  if (typeof game !== 'undefined' && game.biasHistory) {
+    data.biasHistory = (data.biasHistory || []).concat(game.biasHistory).slice(-30);
+  }
   savePlayerData(data);
 }

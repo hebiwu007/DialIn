@@ -128,7 +128,9 @@ const DialIn = {
       document.querySelectorAll('.duel-section').forEach(s => s.classList.add('hidden'));
       document.getElementById('duel-created').classList.remove('hidden');
       document.getElementById('duel-created-score').innerHTML =
-        `<div style="font-size:24px;color:var(--neon-cyan);font-family:var(--font-display);">${results.totalScore} / ${results.maxScore}</div>`;
+        `<div style="font-size:24px;color:var(--neon-cyan);font-family:var(--font-display);">${results.totalScore} / ${results.maxScore}</div>
+         <div style="font-size:13px;color:var(--neon-green);letter-spacing:2px;margin-top:8px;">CHALLENGE CODE</div>
+         <div style="font-size:28px;color:var(--neon-yellow);letter-spacing:8px;font-family:var(--font-mono);">${data.id.toUpperCase()}</div>`;
       document.getElementById('duel-link-url').textContent = data.url;
     }
   },
